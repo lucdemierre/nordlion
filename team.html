@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team - NordLion International</title>
+    <link rel="icon" type="image/x-icon" href="img/logo-2.png">
+    <link rel="stylesheet" href="css/team.css">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header id="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-2.png" alt="NordLion Logo">
+                <span class="logo-text">NordLion International</span>
+            </a>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="onmarket.php">Cars</a></li>
+                    <li><a href="jets.html">Jets</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="team.html" class="active">Team</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="login.html">Login</a></li>
+                </ul>
+                <button class="mobile-menu-btn" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="about-hero" style="background: linear-gradient(rgba(15, 44, 89, 0.8), rgba(15, 44, 89, 0.8)), url('img/team-1.jpg'); background-size: cover; background-position: center 55%;">
+            <div class="container">
+                <h1>Our Team</h1>
+                <p class="subtitle">Meet the Experts Behind NordLion International</p>
+            </div>
+        </section>
+
+        <section class="about-content section-padding">
+            <div class="container">
+                <div class="team-section">
+                    <div class="team-grid">
+                        <div class="team-member">
+                            <img src="img/luc-2.jpg" alt="Luc Demierre">
+                            <h3>Luc Demierre</h3>
+                            <p class="role">Founder & Business Developer</p>
+                            <p>Leading NordLion International with a vision for excellence in luxury vehicle brokerage. Our founder brings extensive experience and a deep passion for automotive excellence to every client interaction. With a commitment to exceptional service and personalized attention.</p>
+                            <a href="mailto:lucdemierre@hotmail.com" class="btn-outline">Contact Me</a>
+                        </div>
+                        <div class="team-member">
+                            <img src="img/team-1.jpg" alt="Eliel Valkama">
+                            <h3>Eliel Valkama</h3>
+                            <p class="role">Co-Founder & Lead Evaluator</p>
+                            <p>With an exceptional eye for automotive excellence, Eliel brings extensive knowledge in sports and hypercar evaluation. His expertise ensures that every vehicle in our portfolio meets the highest standards of quality and performance.</p>
+                            <a href="mailto:eliel.valkama@gmail.com" class="btn-outline">Contact Me</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <div class="social-icons">
+                            <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
+                            <a href="https://www.linkedin.com/company/nordlion-international/" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
+                        </div>
+                        <img src="img/logo-2.png" alt="NordLion Logo">
+                        <span class="footer-logo-text">NordLion International</span>
+                    </div>
+                    <p class="footer-text">Excellence in luxury vehicle brokerage</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="onmarket.html">Cars</a></li>
+                        <li><a href="jets.html">Jets</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-heading">Services</h4>
+                    <ul>
+                        <li><a href="#">Vehicle Acquisition</a></li>
+                        <li><a href="#">Jet Brokerage</a></li>
+                        <li><a href="#">Off-Market Access</a></li>
+                        <li><a href="#">Investment Consulting</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-heading">Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 NordLion International. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Add scroll behavior for navbar
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu functionality
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('nav-menu').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

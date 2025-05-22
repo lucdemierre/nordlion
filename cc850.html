@@ -1,0 +1,329 @@
+{% load static %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Koenigsegg CC850 | NordLion International</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'img/logo-2.png' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header id="header">
+    <div class="container header-container">
+      <a href="{% url 'index' %}" class="logo">
+        <img src="{% static 'img/logo-2.png' %}" alt="NordLion Logo">
+        <span class="logo-text">NordLion International</span>
+      </a>
+      <nav>
+        <ul id="nav-menu">
+            <li><a href="{% static 'index/index.html' %}">Home</a></li>
+            <li><a href="{% static 'onmarket/onmarket.html' %}">Cars</a></li>
+            <li><a href="{% static 'jets/jets.html' %}">Jets</a></li>
+            <li><a href="{% static 'about/about.html' %}">About Us</a></li>
+            <li><a href="{% static 'team/team.html' %}">Team</a></li>
+            <li><a href="{% static 'contact/contact.html' %}">Contact</a></li>
+            <li><a href="{% static 'login/login.html' %}">Login</a></li>
+        </ul>
+        <button class="mobile-menu-btn" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+    </div>
+  </header>
+
+  <!-- Enhanced Image Gallery -->
+  <div class="gallery-container">
+    <div class="gallery-images" id="galleryImages">
+      <div class="gallery-slide">
+        <img src="{% static 'img/cc850.jpg' %}" alt="Koenigsegg CC850 Exterior" />
+        <div class="gallery-caption">Exterior – Modern Homage to the CC8S</div>
+      </div>
+      <div class="gallery-slide">
+        <img src="{% static 'img/cc850-int.png' %}" alt="Koenigsegg CC850 Interior" />
+        <div class="gallery-caption">Interior – Bespoke Swedish Craftsmanship</div>
+      </div>
+      <div class="gallery-slide">
+        <img src="{% static 'img/filler.jpg' %}" alt="Koenigsegg CC850 Engine" />
+        <div class="gallery-caption">Engine – Twin-Turbo V8 Power</div>
+      </div>
+    </div>
+    <button class="gallery-arrow left" onclick="prevSlide()" aria-label="Previous image">
+      <svg class="arrow-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="gallery-arrow right" onclick="nextSlide()" aria-label="Next image">
+      <svg class="arrow-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="gallery-pagination" id="galleryPagination"></div>
+  </div>
+
+  <!-- Car Info -->
+  <main class="jet-main">
+    <section class="jet-overview">
+      <div class="overview-content">
+        <h1 class="jet-title">Koenigsegg CC850</h1>
+        <div class="jet-price">€3,650,000</div>
+        <p class="jet-description">
+          The Koenigsegg CC850 is a modern tribute to the original CC8S, blending classic design with cutting-edge technology. Limited to just 50 units, it features a revolutionary Engage Shift System, a 1,385 hp twin-turbo V8, and a luxurious, driver-focused interior.
+        </p>
+      </div>
+    </section>
+
+    <section class="jet-specifications">
+      <h2 class="section-title">Key Specifications</h2>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-icon">🏁</div>
+          <div class="spec-content">
+            <h3 class="spec-title">Power</h3>
+            <div class="spec-value">1,385 hp (E85) / 1,185 hp (Petrol)</div>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon">⚙️</div>
+          <div class="spec-content">
+            <h3 class="spec-title">Transmission</h3>
+            <div class="spec-value">9-speed Engage Shift System (Manual/Auto)</div>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon">⏱️</div>
+          <div class="spec-content">
+            <h3 class="spec-title">0-100 km/h</h3>
+            <div class="spec-value">~2.8 seconds</div>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon">🚗</div>
+          <div class="spec-content">
+            <h3 class="spec-title">Production</h3>
+            <div class="spec-value">50 units worldwide</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="jet-features">
+      <h2 class="section-title">Exceptional Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3 class="feature-title">Engage Shift System</h3>
+          <p class="feature-description">World-first 9-speed transmission with both gated manual and automatic modes.</p>
+        </div>
+        <div class="feature-card">
+          <h3 class="feature-title">Twin-Turbo V8</h3>
+          <p class="feature-description">5.0L engine producing up to 1,385 hp, no flywheel for instant response.</p>
+        </div>
+        <div class="feature-card">
+          <h3 class="feature-title">Lightweight Construction</h3>
+          <p class="feature-description">Carbon fiber monocoque and body for extreme rigidity and low weight.</p>
+        </div>
+        <div class="feature-card">
+          <h3 class="feature-title">Bespoke Interior</h3>
+          <p class="feature-description">Hand-finished leather, exposed carbon, and digital-analog hybrid gauges.</p>
+        </div>
+      </div>
+    </section>
+    <a href="../../onmarket.html" class="btn btn-outline" style="margin-top: 40px;">Back to Cars</a>
+  </main>
+
+  <!-- Inquiry Section -->
+  <section class="inquiry-section">
+    <div class="inquiry-left">
+      <div class="inquiry-form">
+        <h2>Enquire About the CC850</h2>
+        <form action="#" method="POST" autocomplete="on" aria-label="Enquiry form for Koenigsegg CC850">
+          <div class="form-group">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" id="name" name="name" class="form-input" required autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" name="email" class="form-input" required autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="tel" id="phone" name="phone" class="form-input" autocomplete="tel" />
+          </div>
+          <div class="form-group">
+            <label for="message" class="form-label">Message</label>
+            <textarea id="message" name="message" class="form-textarea" rows="5" required aria-label="Message">I'm interested in the Koenigsegg CC850.</textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Send Inquiry</button>
+        </form>
+      </div>
+    </div>
+    <div class="inquiry-right">
+      <div class="testimonial-container">
+        <blockquote class="testimonial">
+          <p>"The CC850 is a true driver's car – the manual gearbox is a work of art."</p>
+          <footer>— Hypercar Collector, Monaco</footer>
+        </blockquote>
+        <blockquote class="testimonial">
+          <p>"A perfect blend of nostalgia and innovation. Koenigsegg has outdone themselves."</p>
+          <footer>— Automotive Journalist, London</footer>
+        </blockquote>
+        <blockquote class="testimonial">
+          <p>"The attention to detail and performance is simply unmatched."</p>
+          <footer>— Supercar Owner, Dubai</footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                  <div class="social-icons">
+                    <a href="https://www.instagram.com/the_nordlion_international/" target="_blank" aria-label="Instagram">
+                      <img src="{% static 'img/insta.png' %}" alt="Instagram Logo" />
+                    </a>
+                    <a href="https://www.linkedin.com/company/nordlion-international/" target="_blank" aria-label="LinkedIn">
+                      <img src="{% static 'img/linkedin.png' %}" alt="LinkedIn Logo" />
+                    </a>
+                  </div>
+                  <img src="{% static 'img/logo-2.png' %}" alt="NordLion Logo" />
+                  <span class="footer-logo-text">NordLion International</span>
+                </div>
+                <p class="footer-text">
+                  Connecting discerning clients with the world's most extraordinary vehicles and jets.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4 class="footer-heading">Quick Links</h4>
+                <ul>
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="../../onmarket.html">Cars</a></li>
+                    <li><a href="../../jets.html">Jets</a></li>
+                    <li><a href="../../about.html">About Us</a></li>
+                    <li><a href="../../contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4 class="footer-heading">Services</h4>
+                <ul>
+                    <li><a href="../../services.html#vehicle-acquisition">Vehicle Acquisition</a></li>
+                    <li><a href="../../services.html#jet-brokerage">Jet Brokerage</a></li>
+                    <li><a href="../../services.html#off-market">Off-Market Access</a></li>
+                    <li><a href="../../services.html#investment-consulting">Investment Consulting</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4 class="footer-heading">Legal</h4>
+                <ul>
+                    <li><a href="../../privacy.html">Privacy Policy</a></li>
+                    <li><a href="../../terms.html">Terms of Service</a></li>
+                    <li><a href="../../cookies.html">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2025 NordLion International. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="../../scripts.js"></script>
+<script>
+    let currentIndex = 0;
+    const slides = document.querySelectorAll(".gallery-slide");
+    const totalSlides = slides.length;
+    const paginationContainer = document.getElementById("galleryPagination");
+    let slideInterval;
+    let isTransitioning = false;
+    // Create pagination dots
+    function createPagination() {
+      paginationContainer.innerHTML = '';
+      for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement("div");
+        dot.classList.add("gallery-dot");
+        if (i === 0) dot.classList.add("active");
+        dot.setAttribute("aria-label", `Go to slide ${i + 1}`);
+        dot.onclick = () => goToSlide(i);
+        paginationContainer.appendChild(dot);
+      }
+    }
+    function showSlide(index) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      const offset = -index * 100;
+      const galleryImages = document.getElementById("galleryImages");
+      galleryImages.style.transform = `translateX(${offset}%)`;
+      document.querySelectorAll(".gallery-dot").forEach((dot, i) => {
+        dot.classList.toggle("active", i === index);
+      });
+      slides.forEach((slide, i) => {
+        slide.setAttribute("aria-hidden", i !== index);
+      });
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 800);
+    }
+    function nextSlide() {
+      if (isTransitioning) return;
+      currentIndex = (currentIndex + 1) % totalSlides;
+      showSlide(currentIndex);
+    }
+    function prevSlide() {
+      if (isTransitioning) return;
+      currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+      showSlide(currentIndex);
+    }
+    function goToSlide(index) {
+      if (isTransitioning || index === currentIndex) return;
+      currentIndex = index;
+      showSlide(currentIndex);
+    }
+    function startSlideShow() {
+      stopSlideShow();
+      slideInterval = setInterval(nextSlide, 5000);
+    }
+    function stopSlideShow() {
+      if (slideInterval) {
+        clearInterval(slideInterval);
+      }
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+      createPagination();
+      startSlideShow();
+      const gallery = document.querySelector(".gallery-container");
+      gallery.addEventListener("mouseenter", stopSlideShow);
+      gallery.addEventListener("mouseleave", startSlideShow);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          prevSlide();
+        } else if (e.key === "ArrowRight") {
+          nextSlide();
+        }
+      });
+      let touchStartX = 0;
+      let touchEndX = 0;
+      gallery.addEventListener("touchstart", (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      gallery.addEventListener("touchend", (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      });
+      function handleSwipe() {
+        const swipeThreshold = 50;
+        if (touchEndX < touchStartX - swipeThreshold) {
+          nextSlide();
+        } else if (touchEndX > touchStartX + swipeThreshold) {
+          prevSlide();
+        }
+      }
+    });
+</script>
+</body>
+</html>

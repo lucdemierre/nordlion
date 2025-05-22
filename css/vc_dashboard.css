@@ -1,0 +1,493 @@
+/* Essential variables */
+:root {
+  --primary-color: #0F2C59;
+  --secondary-color: #C8A45E;
+  --text-color: #333333;
+  --light-text: #ffffff;
+  --dark-bg: #0F1C2E;
+  --light-bg: #f8f9fa;
+  --border-color: #e0e0e0;
+  --transition: all 0.3s ease;
+  --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Header and Navigation - needed for top navbar */
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 20px 0;
+  transition: all 0.3s ease;
+}
+
+#header.scrolled {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 15px 0;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 45px;
+  width: auto;
+  margin-right: 15px;
+  transition: all 0.3s ease;
+}
+
+#header.scrolled .logo img {
+  height: 40px;
+}
+
+.logo-text {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+#header.scrolled .logo-text {
+  font-size: 1.3rem;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+}
+
+#nav-menu {
+  display: flex;
+  gap: 35px;
+  list-style-type: none; /* Explicitly remove bullet points */
+  margin: 0;
+  padding: 0;
+}
+
+#nav-menu li {
+  margin: 0;
+  padding: 0;
+  list-style-type: none; /* Remove bullets from list items */
+}
+
+#nav-menu a {
+  position: relative;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 5px 0;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+#nav-menu a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--secondary-color);
+  transition: width 0.3s ease;
+}
+
+#nav-menu a:hover {
+  color: var(--secondary-color);
+}
+
+#nav-menu a:hover::after {
+  width: 100%;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+/* Hero Section - needed for the welcome message */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 600px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--dark-bg);
+  background-size: cover;
+  background-position: center;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 28, 46, 0.55);
+  z-index: 1;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: var(--light-text);
+  width: 100%;
+  padding: 20px;
+}
+.hero-title {
+  font-size: 3.3rem;
+  font-weight: 700;
+  margin: 10px auto 20px;
+  color: var(--light-text);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+/* Dashboard Section - needed for tools/cards */
+.dashboard {
+  background-color: var(--light-bg);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-title {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.card-description {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Button Styles - needed for cards and form buttons */
+.btn-primary {
+  display: inline-block;
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: var(--primary-color);
+  color: var(--light-text);
+  border: none;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  list-style-type: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+}
+
+/* Additional rule to remove bullet points from buttons */
+button, .btn, .btn-primary {
+  list-style: none;
+  list-style-type: none;
+}
+
+/* Pending Cars Section - styles for the car entries */
+.pending .car-card {
+  margin: 20px 0;
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.pending .car-card button {
+  padding: 8px 15px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.pending .car-card button[value="approve"] {
+  background-color: #28a745;
+  color: white;
+}
+
+.pending .car-card button[value="reject"] {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Footer - needed for the bottom of the page */
+.footer {
+  background-color: var(--dark-bg);
+  color: #fff;
+  padding: 70px 0 20px;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.footer-brand {
+  margin-right: 30px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 14px;
+}
+
+.footer-logo .social-icons {
+  display: flex;
+  gap: 10px;
+  margin-right: 8px;
+}
+
+.footer-logo img {
+  height: 40px;
+  width: auto;
+  margin-right: 10px;
+}
+
+.footer-logo-text {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #fff;
+  align-self: center;
+  margin-left: 2px;
+  position: relative;
+  top: 2px;
+}
+
+.footer-text {
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.social-icons {
+  display: flex;
+}
+
+.footer-links {
+  margin-top: 0;
+}
+
+.footer-heading {
+  font-size: 1.2rem;
+  color: #fff;
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 10px;
+  margin-top: 10px;
+}
+
+.footer-heading::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: var(--secondary-color);
+}
+
+.footer-links ul li {
+  margin-bottom: 10px;
+}
+
+.footer-links ul li a {
+  opacity: 0.8;
+  transition: var(--transition);
+}
+
+.footer-links ul li a:hover {
+  opacity: 1;
+  color: var(--secondary-color);
+  padding-left: 5px;
+}
+
+.copyright {
+  padding-top: 20px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* Container and Section styles - needed for layout */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section-padding {
+  padding: 100px 0;
+}
+
+.section-heading {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 50px;
+  position: relative;
+  padding-bottom: 15px;
+  color: var(--primary-color);
+  font-family: 'EB Garamond', serif;
+  font-weight: 600;
+}
+
+.section-heading::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: var(--secondary-color);
+}
+
+/* Responsive Styles - needed for mobile compatibility */
+@media (max-width: 992px) {
+  .section-padding {
+    padding: 80px 0;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  #nav-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+  }
+  
+  #nav-menu.active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  #nav-menu li {
+    margin: 15px 0;
+  }
+  
+  .mobile-menu-btn {
+    display: block;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .section-heading {
+    font-size: 2rem;
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-title {
+    font-size: 2rem;
+  }
+}
+
+/* Essential base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Lato', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'EB Garamond', serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+/* Add more styles as needed */
+

@@ -1,0 +1,38 @@
+2025-05-09 21:49:35 - Update car script started
+2025-05-09 21:49:35 - REQUEST_METHOD: POST
+2025-05-09 21:49:35 - POST data: Array
+(
+    [car_id] => 1
+    [name] => Test Car
+    [model] => Test Model
+    [price] => 100000
+    [year] => 2023
+    [mileage] => 0
+    [int_colour] => Black
+    [ext_colour] => White
+    [description] => Test Description
+    [features] => Test Features
+)
+
+2025-05-09 21:49:35 - Inside POST condition
+2025-05-09 21:49:35 - SQL update executed. Result: success
+2025-05-09 21:49:35 - Redirecting to current_cars.php
+2025-05-09 21:49:40 - Update car script started
+2025-05-09 21:49:40 - REQUEST_METHOD: POST
+2025-05-09 21:49:40 - POST data: Array
+(
+    [car_id] => 1
+    [name] => Test Car
+    [model] => Test Model
+    [price] => 100000
+    [year] => 2023
+    [mileage] => 0
+    [int_colour] => Black
+    [ext_colour] => White
+    [description] => Test Description
+    [features] => Test Features
+)
+
+2025-05-09 21:49:40 - Inside POST condition
+2025-05-09 21:49:40 - SQL update executed. Result: success
+2025-05-09 21:49:40 - Redirecting to current_cars.php

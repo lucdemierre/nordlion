@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - NordLion International</title>
+    <link rel="icon" type="image/x-icon" href="img/logo-2.png">
+    <link rel="stylesheet" href="css/contact.css">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header id="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-2.png" alt="NordLion Logo">
+                <span class="logo-text">NordLion International</span>
+            </a>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="onmarket.php">Cars</a></li>
+                    <li><a href="jets.html">Jets</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="team.html">Team</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="login.html">Login</a></li>
+                </ul>
+                <button class="mobile-menu-btn" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="about-hero">
+            <div class="container">
+                <h1>Contact Us</h1>
+                <p class="subtitle">Get in Touch with Our Team</p>
+            </div>
+        </section>
+
+        <section class="contact section-padding">
+            <div class="container">
+                <div class="contact-container">
+                    <div class="contact-info">
+                        <h3 class="contact-heading">Get In Touch</h3>
+                        <p class="contact-text">Interested in our services or have a specific vehicle in mind? Our team is ready to assist you with any inquiries.</p>
+                        
+                        <div class="contact-item">
+                            <span class="contact-icon">📍</span>
+                            <span class="contact-detail">London, United Kingdom - Singapore, Singapore - Turku, Finland</span>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <span class="contact-icon">📱</span>
+                            <span class="contact-detail">+44 7947 977474</span>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <span class="contact-icon">✉️</span>
+                            <span class="contact-detail">lucdemierre@hotmail.com - eliel.valkama@gmail.com</span>
+                        </div>
+
+                        <div class="contact-item">
+                            <span class="contact-icon">⏰</span>
+                            <span class="contact-detail">Mon-Sat: 4:00 PM - 10:00 PM GMT </span>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-form">
+                        <form id="inquiry-form" action="#" method="POST">
+                            <div class="form-group">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" id="name" name="name" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" id="email" name="email" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="subject" class="form-label">Subject</label>
+                                <select id="subject" name="subject" class="form-input" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="vehicle">Vehicle Inquiry</option>
+                                    <option value="jet">Private Jet Inquiry</option>
+                                    <option value="investment">Investment Consultation</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea id="message" name="message" class="form-textarea" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Office Locations Section -->
+                <div class="office-locations" style="margin-top: 80px;">
+                    <h2 class="section-heading">Our Offices</h2>
+                    <div class="locations-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px;">
+                        <div class="location-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">London Office</h3>
+                            <p style="margin-bottom: 10px;">Kensington, London</p>
+                            <p style="margin-bottom: 10px;">United Kingdom</p>
+                            <p style="color: var(--secondary-color);">+44 7947 977474</p>
+                        </div>
+                        <div class="location-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">Finland Office</h3>
+                            <p style="margin-bottom: 10px;">Turku</p>
+                            <p style="margin-bottom: 10px;">Finland</p>
+                            <p style="color: var(--secondary-color);">+358 40 0186049</p>
+                        </div>
+                        <div class="location-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">Singapore Office</h3>
+                            <p style="margin-bottom: 10px;">Singapore</p>
+                            <p style="margin-bottom: 10px;">Singapore</p>
+                            <p style="color: var(--secondary-color);">+65 8333 0905 (Whatsapp)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Hours Section -->
+                <div class="business-hours" style="margin-top: 80px; text-align: center;">
+                    <h2 class="section-heading">Business Hours</h2>
+                    <div class="hours-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 40px;">
+                        <div class="hours-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">London Office</h3>
+                            <p>Monday - Friday: 4:00 PM - 10:00 PM GMT</p>
+                            <p>Saturday: By Appointment</p>
+                            <p>Sunday: Closed</p>
+                        </div>
+                        <div class="hours-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">Finland Office</h3>
+                            <p>Monday - Friday: 4:00 AM - 10:00 PM CET</p>
+                            <p>Saturday: By Appointment</p>
+                            <p>Sunday: Closed</p>
+                        </div>
+                        <div class="hours-card" style="background: white; padding: 30px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">Singapore Office</h3>
+                            <p>Monday - Friday: 9:00 AM - 10:00 PM GST</p>
+                            <p>Saturday: 12:00 PM - 2:00 AM GST</p>
+                            <p>Sunday: Closed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="faq-section" style="margin-top: 80px;">
+                    <h2 class="section-heading">Frequently Asked Questions</h2>
+                    <div class="faq-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px;">
+                        <div class="faq-item" style="background: white; padding: 30px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">How quickly can I expect a response?</h3>
+                            <p>We typically respond to all inquiries within 24 hours during business days. For urgent matters, please call our office directly.</p>
+                        </div>
+                        <div class="faq-item" style="background: white; padding: 30px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">Do you offer virtual consultations?</h3>
+                            <p>Yes, we offer virtual consultations via video call for clients who prefer remote meetings or are located in different time zones.</p>
+                        </div>
+                        <div class="faq-item" style="background: white; padding: 30px; border-radius: 10px; box-shadow: var(--box-shadow);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">What information should I prepare?</h3>
+                            <p>Please have your basic contact information ready, along with any specific details about the vehicle or service you're interested in.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <div class="social-icons">
+                            <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
+                            <a href="https://www.linkedin.com/company/nordlion-international/" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
+                        </div>
+                        <img src="img/logo-2.png" alt="NordLion Logo">
+                        <span class="footer-logo-text">NordLion International</span>
+                    </div>
+                    <p class="footer-text">Excellence in luxury vehicle brokerage</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="onmarket.html">Cars</a></li>
+                        <li><a href="jets.html">Jets</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-heading">Services</h4>
+                    <ul>
+                        <li><a href="#">Vehicle Acquisition</a></li>
+                        <li><a href="#">Jet Brokerage</a></li>
+                        <li><a href="#">Off-Market Access</a></li>
+                        <li><a href="#">Investment Consulting</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="footer-heading">Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 NordLion International. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Add scroll behavior for navbar
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Contact form submission
+        document.getElementById('inquiry-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Sending...';
+            submitButton.disabled = true;
+
+            try {
+                const formData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    subject: document.getElementById('subject').value,
+                    message: document.getElementById('message').value
+                };
+
+                const response = await fetch('http://localhost:3000/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Message sent successfully! We will get back to you soon.');
+                    this.reset();
+                } else {
+                    throw new Error(data.error || 'Failed to send message');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

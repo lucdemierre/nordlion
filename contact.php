@@ -62,12 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
             <nav>
                 <ul id="nav-menu">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.php">Home</a></li>
                     <li><a href="onmarket.php">Cars</a></li>
-                    <li><a href="jets.html">Jets</a></li>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="team.html">Team</a></li>
-                    <li><a href="contact.html">Contact</a></li><?php if ($is_logged_in): ?>
+                    <li><a href="jets.php">Jets</a></li>
+                    <li><a href="about.php">About Us</a></li>
+                    <li><a href="team.php">Team</a></li>
+                    <li><a href="contact.php">Contact</a></li><?php if ($is_logged_in): ?>
     <li><a href="logout.php">Logout</a></li>
                     <?php else: ?>           
                     <li><a href="login.html">Login</a></li><?php endif; ?>
@@ -275,11 +275,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="footer-links">
                     <h4 class="footer-heading">Quick Links</h4>
                     <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="onmarket.html">Cars</a></li>
-                        <li><a href="jets.html">Jets</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li><?php if ($is_logged_in): ?>
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="onmarket.php">Cars</a></li>
+                        <li><a href="jets.php">Jets</a></li>
+                        <li><a href="about.php">About Us</a></li>
+                        <li><a href="contact.php">Contact</a></li><?php if ($is_logged_in): ?>
     <li><a href="logout.php">Logout</a></li>
 <?php endif; ?>
                     </ul>

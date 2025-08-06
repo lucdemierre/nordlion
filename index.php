@@ -211,7 +211,7 @@ if ($isLoggedIn && !empty($userName)) {
                 
                 <div class="card">
                     <h3>User Management</h3>
-                    <p>Manage users and roles in the system.</p>
+                    <p>Manage users and roles in the system. <br></br></p>
                     <a href="manage_users.php" class="btn btn-primary">Manage Users</a>
                 </div>
             </div>

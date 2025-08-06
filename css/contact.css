@@ -421,6 +421,7 @@ nav {
     justify-content: center;
     gap: 2rem;
     margin-top: 2rem;
+    font: 'Lato';
 }
 
 .centered-item {
@@ -597,7 +598,6 @@ nav {
   justify-content: center;
   margin-bottom: 40px;
   font-size: 1.4rem;
-  font-weight: 400;
   line-height: 1.6;
   letter-spacing: 0.3px;
   padding: 10px 0;

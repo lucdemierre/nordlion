@@ -439,11 +439,7 @@ nav {
     color: var(--text-color);
 }
 
-/* Contact Form */
-.contact-form {
-    max-width: 600px;
-    margin: 0 auto;
-}
+/*contact form*/
 
 .contact-form h2 {
     font-size: 2.5rem;

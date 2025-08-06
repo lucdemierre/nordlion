@@ -69,8 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <li><a href="team.html">Team</a></li>
                     <li><a href="contact.html">Contact</a></li><?php if ($is_logged_in): ?>
     <li><a href="logout.php">Logout</a></li>
-<?php endif; ?>
-                    <li><a href="login.html">Login</a></li>
+                    <?php else: ?>           
+                    <li><a href="login.html">Login</a></li><?php endif; ?>
                 </ul>
                 <button class="mobile-menu-btn" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
@@ -107,21 +107,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <span class="contact-icon">📱</span>
                             <span class="contact-detail">+44 7947 977474</span>
                         </div>
-<?php else: ?>
-<div class="contact-center">
-    <h3>Get In Touch</h3>
-    <p>Interested in our services or have a specific vehicle in mind? Our team is ready to assist you with any inquiries.</p>
-    <div class="contact-items">
-        <div class="centered-item"><span class="icon">📍</span>London, United Kingdom - Singapore, Singapore - Turku, Finland</div>
-        <div class="centered-item"><span class="icon">📱</span>+44 7947 977474</div>
-        <div class="centered-item"><span class="icon">✉️</span>lucdemierre@hotmail.com - eliel.valkama@gmail.com</div>
-        <div class="centered-item"><span class="icon">⏰</span>Mon-Sat: 4:00 PM - 10:00 PM GMT</div>
-    </div>
-</div>
-<?php endif; ?>
 
-                        
-                        <div class="contact-item">
+
+                    <div class="contact-item">
                             <span class="contact-icon">✉️</span>
                             <span class="contact-detail">lucdemierre@hotmail.com - eliel.valkama@gmail.com</span>
                         </div>
@@ -131,6 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <span class="contact-detail">Mon-Sat: 4:00 PM - 10:00 PM GMT </span>
                         </div>
                     </div>
+                    
                     
                     <div class="contact-form">
                         <form id="inquiry-form" action="" method="POST">
@@ -180,6 +169,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </form>
                     </div>
                 </div>
+<?php else: ?>
+<div class="contact-center">
+    <h3>Get In Touch</h3>
+    <p>Interested in our services or have a specific vehicle in mind? Our team is ready to assist you with any inquiries.</p>
+    <div class="contact-items">
+        <div class="centered-item"><span class="icon">📍</span>London, United Kingdom - Singapore, Singapore - Turku, Finland</div>
+        <div class="centered-item"><span class="icon">📱</span>+44 7947 977474</div>
+        <div class="centered-item"><span class="icon">✉️</span>lucdemierre@hotmail.com - eliel.valkama@gmail.com</div>
+        <div class="centered-item"><span class="icon">⏰</span>Mon-Sat: 4:00 PM - 10:00 PM GMT</div>
+    </div>
+</div>
+<?php endif; ?>
+
+                        
+                        
 
                 <!-- Office Locations Section -->
                 <div class="office-locations" style="margin-top: 80px;">

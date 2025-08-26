@@ -280,7 +280,9 @@ if ($isLoggedIn && !empty($userName)) {
   </main> <!-- Close the main tag before inquiry section -->
 
   <!-- Inquiry Section -->
-  <section class="inquiry-section">
+  <?php if ($isLoggedIn): ?>
+  <!-- Inquiry Section -->
+  <section class="inquiry-section" id="enquiry">
     <div class="inquiry-left">
       <div class="inquiry-form">
         <h2>Enquire About <?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?></h2>
@@ -301,7 +303,9 @@ if ($isLoggedIn && !empty($userName)) {
           </div>
           <div class="form-group">
             <label for="message" class="form-label">Message</label>
-            <textarea id="message" name="message" class="form-textarea" rows="5" required aria-label="Message">I'm interested in the <?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?>.</textarea>
+            <textarea id="message" name="message" class="form-textarea" rows="5" required aria-label="Message">
+I'm interested in the <?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?>.
+</textarea>
           </div>
           <button type="submit" class="btn btn-primary btn-block">Send Inquiry</button>
         </form>
@@ -324,7 +328,25 @@ if ($isLoggedIn && !empty($userName)) {
       </div>
     </div>
   </section>
-
+<?php else: ?>
+    <div class="inquiry-right">
+      <div class="testimonial-container">
+        <blockquote class="testimonial">
+          <p>"The CC850 is a true driver's car – the manual gearbox is a work of art."</p>
+          <footer>— Hypercar Collector, Monaco</footer>
+        </blockquote>
+        <blockquote class="testimonial">
+          <p>"A perfect blend of nostalgia and innovation. Koenigsegg has outdone themselves."</p>
+          <footer>— Automotive Journalist, London</footer>
+        </blockquote>
+        <blockquote class="testimonial">
+          <p>"The attention to detail and performance is simply unmatched."</p>
+          <footer>— Supercar Owner, Dubai</footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+<?php endif; ?>
   <footer class="footer" style="background-color: #0F2C59;">
         <div class="container">
         <div class="footer-container">

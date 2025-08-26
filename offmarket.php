@@ -1,21 +1,41 @@
 <?php
 session_start();
-require 'php/db.php';
+require_once 'php/db.php';
 require_once 'php/session_check.php';
 
-// Ensure user is logged in as VC
-if (!$isVC) {
-    header("Location: login.html?message=" . urlencode("You need to be logged in as a VC to access this page."));
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName   = $isLoggedIn ? ($_SESSION['user_name'] ?? '') : '';
+$userRole   = $isLoggedIn ? ($_SESSION['user_role'] ?? '') : '';
+
+$firstName = '';
+if ($isLoggedIn && !empty($userName)) {
+    $nameParts = explode(' ', $userName);
+    $firstName = $nameParts[0];
+}
+
+if (!$isLoggedIn) {
+    header("Location: login.html");
     exit;
 }
 
-// Fetch offmarket cars (only available to VCs)
-$stmt = $pdo->prepare("SELECT * FROM cars WHERE status = 'offmarket'");
-$stmt->execute();
-$cars = $stmt->fetchAll();
+// ROLE-GATED FETCH (Admin + VC only see off-market + form)
+if ($userRole === 'admin' || $userRole === 'vc') {
+    $stmt = $pdo->prepare("SELECT id, name, model, price, description FROM cars WHERE status = 'offmarket'");
+    $stmt->execute();
+    $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} elseif ($userRole === 'mop') {
+    echo "<script>
+            alert('Hi " . htmlspecialchars($firstName, ENT_QUOTES) . ", this page is reserved for Admin and VC users.');
+            window.location.href = 'index.php';
+          </script>";
+    exit;
+} else {
+    header("Location: login.html");
+    exit;
+}
 
-// Get user name if logged in
-$userName = $isLoggedIn ? $_SESSION['user_name'] : '';
+// Optional debug: visit offmarket.php?debug=1
+$debug = isset($_GET['debug']) && $_GET['debug'] == '1';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,28 +48,12 @@ $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
-    .sticky-sidebar {
-      position: sticky;
-      top: 100px;
-      align-self: flex-start;
-    }
-    
-    .exclusive-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #000;
-      color: gold;
-      padding: 5px 10px;
-      border-radius: 3px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-    
-    .car-card {
-      position: relative;
-    }
+    .exclusive-badge { position:absolute; top:10px; right:10px; background:#000; color:gold; padding:5px 10px; border-radius:3px; font-size:.8rem; font-weight:700; letter-spacing:1px; }
+    .car-card { position:relative; }
+    .muted { color:#6c757d; }
+    .sticky-sidebar { position:sticky; top:100px; align-self:flex-start; }
+    .container-flex { display:flex; gap:40px; align-items:flex-start; max-width:1200px; margin:100px auto 0; padding:40px 20px; }
+    .debug { font-size:12px; color:#666; margin-top:8px; }
   </style>
 </head>
 <body>
@@ -61,11 +65,10 @@ $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
       </a>
       <nav>
         <ul id="nav-menu">
-          <li><a href="index.php">Home</a></li>
+          <li><a href="index.php" class="active">Home</a></li>
           <li><a href="onmarket.php">Cars</a></li>
-          <li><a href="offmarket.php" class="active">Off-Market</a></li>
-          <li><a href="jets.html">Jets</a></li>
-          <li><a href="about.html">About Us</a></li>
+          <li><a href="offmarket.php">Off Market</a></li>
+          <li><a href="about.php">About Us</a></li>
           <li><a href="team.html">Our Team</a></li>
           <li><a href="contact.php">Contact</a></li>
           <?php if ($isLoggedIn): ?>
@@ -86,52 +89,67 @@ $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
     </div>
   </header>
 
-  <main class="section-padding" style="display: flex; gap: 40px; align-items: flex-start; max-width: 1200px; margin: 100px auto 0; padding: 40px 20px;">
-    <!-- Cars List -->
-    <section style="flex: 2;">
-      <h2 class="section-heading">Off-Market Vehicles - Exclusive Listings</h2>
-      <p class="intro-text" style="margin-bottom: 30px;">As a valued VC partner, you have exclusive access to these private listings not available to the general public. These vehicles are rare opportunities available only through our exclusive network.</p>
-      
-      <div class="featured-grid" id="car-list">
-        <?php foreach ($cars as $car): ?>
-          <?php
-            // Fetch first image if using car_images table
-            $imageStmt = $pdo->prepare("SELECT image_path FROM car_images WHERE car_id = ? LIMIT 1");
-            $imageStmt->execute([$car['id']]);
-            $image = $imageStmt->fetchColumn();
-          ?>
-          <div class="car-card">
-            <div class="exclusive-badge">EXCLUSIVE</div>
-            <div class="card-image">
-              <a href="car_details.php?id=<?php echo $car['id']; ?>&mode=offmarket">
-                <img src="<?php echo htmlspecialchars($image ?: 'img/default-car.jpg'); ?>" alt="<?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?>">
-              </a>
-            </div>
-            <div class="card-details">
-              <h3 class="card-title">
-                <a href="car_details.php?id=<?php echo $car['id']; ?>&mode=offmarket" style="color: inherit; text-decoration: none;">
-                  <?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?>
+  <main class="section-padding container-flex">
+    <!-- Cars -->
+    <section style="flex:2;">
+      <h2 class="section-heading">Off-Market Vehicles — Exclusive Listings</h2>
+      <p class="intro-text" style="margin-bottom:30px;">Exclusive private listings available to Admin/VC only.</p>
+
+      <?php if (empty($cars)): ?>
+        <div class="muted" style="font-size:1rem; padding:16px; background:#f8f9fa; border:1px solid #eee; border-radius:6px;">
+          No current off-market vehicles.
+        </div>
+      <?php else: ?>
+        <div class="featured-grid" id="car-list">
+          <?php foreach ($cars as $car): ?>
+            <?php
+              $imageStmt = $pdo->prepare("SELECT image_path FROM car_images WHERE car_id = ? LIMIT 1");
+              $imageStmt->execute([$car['id']]);
+              $image = $imageStmt->fetchColumn();
+            ?>
+            <div class="car-card">
+              <div class="exclusive-badge">EXCLUSIVE</div>
+              <div class="card-image">
+                <a href="car_details.php?id=<?php echo (int)$car['id']; ?>&mode=offmarket">
+                  <img src="<?php echo htmlspecialchars($image ?: 'img/default-car.jpg'); ?>" alt="<?php echo htmlspecialchars(($car['name'] ?? '') . ' ' . ($car['model'] ?? '')); ?>">
                 </a>
-              </h3>
-              <p class="card-price">€<?php echo number_format($car['price']); ?></p>
-              <p class="card-description"><?php echo htmlspecialchars($car['description']); ?></p>
+              </div>
+              <div class="card-details">
+                <h3 class="card-title">
+                  <a href="car_details.php?id=<?php echo (int)$car['id']; ?>&mode=offmarket" style="color:inherit; text-decoration:none;">
+                    <?php echo htmlspecialchars(($car['name'] ?? '') . ' ' . ($car['model'] ?? '')); ?>
+                  </a>
+                </h3>
+                <p class="card-price">€<?php echo number_format((float)$car['price']); ?></p>
+                <p class="card-description"><?php echo htmlspecialchars($car['description'] ?? ''); ?></p>
+              </div>
             </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+
+      <?php if ($debug): ?>
+        <div class="debug">debug: role=<?php echo htmlspecialchars($userRole); ?>, offmarket_count=<?php echo count($cars); ?></div>
+      <?php endif; ?>
     </section>
 
-    <!-- Inquiry Sidebar -->
-    <aside class="sticky-sidebar" style="flex: 1; background-color: #f8f9fa; padding: 30px; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-      <h3 style="margin-bottom: 20px; color: var(--primary-color);">Interested in an Off-Market Vehicle?</h3>
-      <p style="margin-bottom: 20px; font-size: 0.95rem;">Use this quick form to inquire about any exclusive vehicle. A dedicated investment specialist will contact you directly to discuss details.</p>
+    <!-- Conditional Inquiry Sidebar (only when cars exist) -->
+    <?php if (!empty($cars)): ?>
+    <aside class="sticky-sidebar" style="flex:1; background:#f8f9fa; padding:30px; border-radius:5px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+      <h3 style="margin-bottom:20px; color: var(--primary-color);">Interested in an Off-Market Vehicle?</h3>
+      <p style="margin-bottom:20px; font-size:0.95rem;">Select a vehicle and send a private inquiry.</p>
       <form action="php/offmarket_inquiry.php" method="POST">
-        <!-- Hidden field for user ID -->
-        <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
-        
+        <input type="hidden" name="user_id" value="<?php echo (int)$_SESSION['user_id']; ?>">
         <div class="form-group">
           <label for="vehicle" class="form-label">Vehicle of Interest</label>
-          <input type="text" id="vehicle" name="vehicle" class="form-input" required>
+          <select id="vehicle" name="car_id" class="form-input" required>
+            <option value="">Select a vehicle</option>
+            <?php foreach ($cars as $car): ?>
+              <option value="<?php echo (int)$car['id']; ?>">
+                <?php echo htmlspecialchars(($car['name'] ?? '') . ' ' . ($car['model'] ?? '')); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
         </div>
         <div class="form-group">
           <label for="message" class="form-label">Your Inquiry</label>
@@ -147,75 +165,69 @@ $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
             <option value="resale">Purchase for Resale</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Private Inquiry</button>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Submit Private Inquiry</button>
       </form>
     </aside>
+    <?php endif; ?>
   </main>
 
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-container">
-        <div class="footer-brand">
-          <div class="footer-logo">
-            <div class="social-icons">
-              <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
-              <a href="https://www.linkedin.com/company/nordlion-international/" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
+  <footer class="footer" style="background-color: #0F2C59;">
+        <div class="container">
+        <div class="footer-container">
+            <div class="footer-brand">
+            <div class="footer-logo">
+                <div class="social-icons">
+                <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
+                <a href="https://www.linkedin.com/company/nordlion-international/?viewAsMember=true" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
+                </div>
+                <img src="img/logo-2.png" alt="NordLion Logo">
+                <span class="footer-logo-text">NordLion International</span>
             </div>
-            <img src="img/logo-2.png" alt="NordLion Logo">
-            <span class="footer-logo-text">NordLion International</span>
-          </div>
-          <p class="footer-text">Excellence in luxury vehicle brokerage</p>
+            <p class="footer-text">Excellence in luxury vehicle brokerage.</p>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Quick Links</h4>
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="onmarket.php">Cars</a></li>
+                <li><a href="offmarket.php">Off Market</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Services</h4>
+            <ul>
+                <li><a href="onmarket.php">Vehicle Acquisition</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="offmarket.php">Off-Market Access</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Legal</h4>
+            <ul>
+                <li><a href="privacy.php">Privacy Policy</a></li>
+                <li><a href="terms.php">Terms of Service</a></li>
+                <li><a href="cookie.php">Cookie Policy</a></li>
+            </ul>
+            </div>
         </div>
-          
-        <div class="footer-links">
-          <h4 class="footer-heading">Quick Links</h4>
-          <ul>
-            <li><a href="index.php">Home</a></li>
-            <li><a href="onmarket.php">Cars</a></li>
-            <li><a href="jets.html">Jets</a></li>
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="contact.php">Contact</a></li>
-          </ul>
+
+        <div class="copyright">
+            <p>&copy; 2025 NordLion International. All rights reserved.</p>
         </div>
-        
-        <div class="footer-links">
-          <h4 class="footer-heading">Services</h4>
-          <ul>
-            <li><a href="#">Vehicle Acquisition</a></li>
-            <li><a href="#">Jet Brokerage</a></li>
-            <li><a href="#">Off-Market Access</a></li>
-            <li><a href="#">Investment Consulting</a></li>
-          </ul>
         </div>
-        
-        <div class="footer-links">
-          <h4 class="footer-heading">Legal</h4>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Cookie Policy</a></li>
-          </ul>
-        </div>
-      </div>
-      
-      <div class="copyright">
-        <p>&copy; 2025 NordLion International. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
+    </footer>
 
   <script>
-    // Add scroll behavior for navbar
     window.addEventListener('scroll', function() {
       const header = document.getElementById('header');
-      if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
+      if (window.scrollY > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled');
     });
-    
-    // Mobile menu functionality
     document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
       document.getElementById('nav-menu').classList.toggle('active');
     });

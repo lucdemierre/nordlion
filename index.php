@@ -7,12 +7,109 @@ $isLoggedIn = isset($_SESSION['user_id']);
 $userName = $isLoggedIn ? $_SESSION['user_name'] : '';
 $userRole = $isLoggedIn ? $_SESSION['user_role'] : '';
 
+
 // Get first name if user is logged in
 $firstName = '';
 if ($isLoggedIn && !empty($userName)) {
     $nameParts = explode(' ', $userName);
     $firstName = $nameParts[0];
 }
+
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $inquiry_type = $_POST['inquiry_type'] ?? '';
+    $message = $_POST['message'] ?? '';
+    $user_id = $_SESSION['user_id'] ?? null;
+}
+
+
+$is_logged_in = isset($_SESSION['user_id']);
+
+// Database connection
+require_once 'php/db.php';
+
+// Fetch inquiry types from database
+$inquiry_types = [];
+try {
+    $stmt = $pdo->query("SELECT DISTINCT type, subject FROM inquiries WHERE status = 'new' ORDER BY subject");
+} catch (PDOException $e) {
+    // If there's an error, use default types as fallback
+    $inquiry_types = [
+        ['type' => 'car', 'subject' => 'Car Inquiry'],
+        ['type' => 'jet', 'subject' => 'Jet Inquiry'],
+        ['type' => 'investment', 'subject' => 'Investment Opportunity'],
+        ['type' => 'general', 'subject' => 'General Inquiry'],
+        ['type' => 'other', 'subject' => 'Other']
+    ];
+}
+
+
+
+
+// Process form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = $_SESSION['user_id'] ?? null;         // must be set if user_id is NOT NULL in DB
+    $message = $_POST['message'] ?? '';
+    $type    = 'general';
+    $subject = 'General Inquiry';
+
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO inquiries (user_id, type, subject, message, status)
+            VALUES (?, ?, ?, ?, 'new')
+        ");
+        $stmt->execute([$user_id, $type, $subject, $message]);
+
+        $success_message = "Thank you for your inquiry. We'll get back to you soon!";
+    } catch (PDOException $e) {
+        $error_message = "There was an error submitting your inquiry. Please try again.";
+    }
+}
+
+
+
+// Check if user is logged in
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName   = $isLoggedIn ? ($_SESSION['user_name'] ?? '') : '';
+$userRole   = $isLoggedIn ? ($_SESSION['user_role'] ?? '') : '';
+
+
+// Default values
+$email = '';
+$firstName = '';
+
+// If logged in, try to get email from session or database
+if ($isLoggedIn) {
+    if (!empty($_SESSION['user_email'])) {
+        $email = $_SESSION['user_email'];
+    } else {
+        // Optional: fetch from database if not stored in session
+        $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $dbEmail = $stmt->fetchColumn();
+        if ($dbEmail) {
+            $email = $dbEmail;
+            $_SESSION['user_email'] = $dbEmail; // cache for next time
+        }
+    }
+}
+
+// If form was submitted, keep the posted email instead
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'] ?? $email;
+}
+
+// Get first name from full name if available
+if (!empty($userName)) {
+    $nameParts = explode(' ', $userName);
+    $firstName = $nameParts[0];
+}
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,9 +136,9 @@ if ($isLoggedIn && !empty($userName)) {
                 <ul id="nav-menu">
                     <li><a href="index.php" class="active">Home</a></li>
                     <li><a href="onmarket.php">Cars</a></li>
-                    <li><a href="jets.html">Jets</a></li>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="team.html">Our Team</a></li>
+                    <li><a href="offmarket.php">Off Market</a></li>
+                    <li><a href="about.php">About Us</a></li>
+                    <li><a href="team.php">Our Team</a></li>
                     <li><a href="contact.php">Contact</a></li>
                     <?php if ($isLoggedIn): ?>
                         <?php if ($userRole === 'admin'): ?>
@@ -172,13 +269,13 @@ if ($isLoggedIn && !empty($userName)) {
                 <div class="card">
                     <h3>Your Inquiries</h3>
                     <p>View and manage your vehicle inquiries and requests.</p>
-                    <a href="user_inquiries.php" class="btn btn-primary">View Inquiries</a>
+                    <a href="mop_inquiries.php" class="btn btn-primary">View Inquiries</a>
                 </div>
                 
                 <div class="card">
-                    <h3>Saved Vehicles</h3>
-                    <p>Access your saved vehicles and favorite listings.</p>
-                    <a href="saved_vehicles.php" class="btn btn-primary">View Saved</a>
+                    <h3>View On Market</h3>
+                    <p>Access NordLion's current stock.</p>
+                    <a href="onmarket.php" class="btn btn-primary">View On Market</a>
                 </div>
                 
                 <div class="card">
@@ -200,7 +297,7 @@ if ($isLoggedIn && !empty($userName)) {
                 <div class="card">
                     <h3>Pending Listings</h3>
                     <p>Manage vehicle submissions awaiting approval.</p>
-                    <a href="dashboard.php" class="btn btn-primary">View Pending</a>
+                    <a href="dashboard.php#pending-section" class="btn btn-primary">View Pending</a>
                 </div>
                 
                 <div class="card">
@@ -210,9 +307,9 @@ if ($isLoggedIn && !empty($userName)) {
                 </div>
                 
                 <div class="card">
-                    <h3>User Management</h3>
-                    <p>Manage users and roles in the system. <br></br></p>
-                    <a href="manage_users.php" class="btn btn-primary">Manage Users</a>
+                    <h3>Off Market Inquiry</h3>
+                    <p>View Off Market Inquiries. <br></br></p>
+                    <a href="offmarket_inquiries_admin.php" class="btn btn-primary">View Inquiries</a>
                 </div>
             </div>
         </div>
@@ -231,8 +328,8 @@ if ($isLoggedIn && !empty($userName)) {
                 <div class="about-content">
                     <h2>About NordLion International</h2>
                     <p>Founded in 2020, NordLion International has established itself as a premier luxury vehicle brokerage, connecting discerning clients with extraordinary automobiles and private aircraft.</p>
-                    <p>Based in London, with a global network of partners, we specialize in rare and limited-production vehicles that represent the pinnacle of automotive engineering and design.</p>
-                    <a href="team.html" class="btn btn-primary">Meet Our Team</a>
+                    <p>Based in London, with a global network of partners, we specialize in rare and limited-production vehicles that represent the pinnacle of automotive engineering and design.<br></br></p>
+                    <a href="team.php" class="btn btn-primary">Meet Our Team</a>
                 </div>
             </div>
         </div>
@@ -249,13 +346,8 @@ if ($isLoggedIn && !empty($userName)) {
                     <p class="service-description">Expert sourcing of rare and limited production hypercars and luxury vehicles based on your specific requirements.</p>
                 </a>
                 
-                <a href="jets.html" class="service-card">
-                    <div class="service-icon">✈️</div>
-                    <h3 class="service-title">Jet Brokerage</h3>
-                    <p class="service-description">Comprehensive private jet acquisition and sales services with dedicated aviation specialists.</p>
-                </a>
                 
-                <a href="#" class="service-card">
+                <a href="offmarket.php" class="service-card">
                     <div class="service-icon">🔒</div>
                     <h3 class="service-title">Off-Market Access</h3>
                     <p class="service-description">Gain exclusive access to vehicles and aircraft not available to the general public through our private network.</p>
@@ -283,19 +375,25 @@ if ($isLoggedIn && !empty($userName)) {
             <!-- Two-column layout with form for logged-in users -->
             <div class="contact-container">
                 <div class="contact-form">
-                    <form action="php/contact.php" method="POST">
+                    <form action="index.php" method="POST">
+                        <input type="hidden" name="inquiry_type" value="general">
+                        <input type="hidden" name="subject" value="General Inquiry">
                         <div class="form-group">
                             <label for="name">Your Name</label>
                             <input type="text" id="name" name="name" required value="<?php echo htmlspecialchars($userName); ?>">
                         </div>
                         <div class="form-group">
                             <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" required>
+                            <input type="text" id="email" name="email" required value="<?php echo htmlspecialchars($email); ?>">
                         </div>
+
+
                         <div class="form-group">
                             <label for="message">Your Message</label>
                             <textarea id="message" name="message" rows="5" required></textarea>
                         </div>
+
+                        
                         <button type="submit" class="btn btn-primary">Send Message</button>
                     </form>
                 </div>
@@ -357,56 +455,55 @@ if ($isLoggedIn && !empty($userName)) {
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" style="background-color: #0F2C59;">
         <div class="container">
-            <div class="footer-container">
-                <div class="footer-brand">
-                    <div class="footer-logo">
-                        <div class="social-icons">
-                            <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
-                            <a href="https://www.linkedin.com/company/nordlion-international/" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
-                        </div>
-                        <img src="img/logo-2.png" alt="NordLion Logo">
-                        <span class="footer-logo-text">NordLion International</span>
-                    </div>
-                    <p class="footer-text">Excellence in luxury vehicle brokerage</p>
+        <div class="footer-container">
+            <div class="footer-brand">
+            <div class="footer-logo">
+                <div class="social-icons">
+                <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
+                <a href="https://www.linkedin.com/company/nordlion-international/?viewAsMember=true" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
                 </div>
-                  
-                
-                <div class="footer-links">
-                    <h4 class="footer-heading">Quick Links</h4>
-                    <ul>
-                        <li><a href="index.php">Home</a></li>
-                        <li><a href="onmarket.php">Cars</a></li>
-                        <li><a href="jets.html">Jets</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.php">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h4 class="footer-heading">Services</h4>
-                    <ul>
-                        <li><a href="#">Vehicle Acquisition</a></li>
-                        <li><a href="#">Jet Brokerage</a></li>
-                        <li><a href="#">Off-Market Access</a></li>
-                        <li><a href="#">Investment Consulting</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h4 class="footer-heading">Legal</h4>
-                    <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
-                    </ul>
-                </div>
+                <img src="img/logo-2.png" alt="NordLion Logo">
+                <span class="footer-logo-text">NordLion International</span>
             </div>
-            
-            <div class="copyright">
-                <p>&copy; 2025 NordLion International. All rights reserved.</p>
+            <p class="footer-text">Excellence in luxury vehicle brokerage.</p>
             </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Quick Links</h4>
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="onmarket.php">Cars</a></li>
+                <li><a href="offmarket.php">Off Market</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Services</h4>
+            <ul>
+                <li><a href="onmarket.php">Vehicle Acquisition</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="offmarket.php">Off-Market Access</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Legal</h4>
+            <ul>
+                <li><a href="privacy.php">Privacy Policy</a></li>
+                <li><a href="terms.php">Terms of Service</a></li>
+                <li><a href="cookie.php">Cookie Policy</a></li>
+            </ul>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>&copy; 2025 NordLion International. All rights reserved.</p>
+        </div>
         </div>
     </footer>
 

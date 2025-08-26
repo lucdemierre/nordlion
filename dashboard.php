@@ -5,6 +5,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit;
 }
 require 'php/db.php';
+require_once 'php/session_check.php';
+
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName = $isLoggedIn ? $_SESSION['user_name'] : '';
+$userRole = $isLoggedIn ? $_SESSION['user_role'] : '';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,17 +34,28 @@ require 'php/db.php';
                 <span class="logo-text">NordLion International</span>
             </a>
             <nav>
-                <ul id="nav-menu">
-                    <li><a href="dashboard.php" class="active">Dashboard</a></li>
-                    <li><a href="inquiries.php">Inquiries</a></li>
-                    <li><a href="onmarket.html">Cars</a></li>
-                    <li><a href="jets.html">Jets</a></li>
+            <ul id="nav-menu">
+            <li><a href="index.php" class="active">Home</a></li>
+            <li><a href="onmarket.php">Cars</a></li>
+            <li><a href="offmarket.php">Off Market</a></li>
+            <li><a href="about.php">About Us</a></li>
+            <li><a href="team.html">Our Team</a></li>
+            <li><a href="contact.php">Contact</a></li>
+                <?php if ($isLoggedIn): ?>
+                    <?php if ($userRole === 'admin'): ?>
+                        <li><a href="dashboard.php">Admin Panel</a></li>
+                    <?php elseif ($userRole === 'vc'): ?>
+                        <li><a href="vc_dashboard.php">VC Panel</a></li>
+                    <?php endif; ?>
                     <li><a href="logout.php">Logout</a></li>
-                </ul>
-                <button class="mobile-menu-btn" aria-label="Toggle menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </nav>
+                <?php else: ?>
+                    <li><a href="login.html">Login</a></li>
+                <?php endif; ?>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
         </div>
     </header>
 
@@ -81,11 +98,6 @@ require 'php/db.php';
                         <p class="card-description">Add new cars to the off-market sector.</p>
                         <a href="add_car_offmarket.php" class="btn btn-primary">Add Car</a>
                     </div>
-                    <div class="card">
-                        <h2 class="card-title">Add Jets</h2>
-                        <p class="card-description">Add new jets to the inventory.</p>
-                        <a href="add_jet.php" class="btn btn-primary">Add Jet</a>
-                    </div>
 
                     <div class="card">
                         <h2 class="card-title">Current Cars</h2>
@@ -94,14 +106,14 @@ require 'php/db.php';
                     </div>
 
                     <div class="card">
-                        <h2 class="card-title">Current Deals</h2>
-                        <p class="card-description">Current deals occuring.</p>
-                        <a href="current_deals.php" class="btn btn-primary">Current Deals</a>
+                        <h2 class="card-title">Off Market Inquiry</h2>
+                        <p class="card-description">View Off Market Inquiries.</p>
+                        <a href="offmarket_inquiries_admin.php" class="btn btn-primary">Off Market Inquiries</a>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="pending section-padding" style="margin-top: 60px;">
+        <section id="pending-section" class="pending section-padding" style="margin-top: 60px;">
             <div class="container">
                 <h2 class="section-heading">Pending Car Submissions</h2>
                 <?php
@@ -130,55 +142,55 @@ require 'php/db.php';
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer" style="background-color: #0F2C59;">
         <div class="container">
-            <div class="footer-container">
-                <div class="footer-brand">
-                    <div class="footer-logo">
-                        <div class="social-icons">
-                            <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
-                            <a href="https://www.linkedin.com/company/nordlion-international/" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
-                        </div>
-                        <img src="img/logo-2.png" alt="NordLion Logo">
-                        <span class="footer-logo-text">NordLion International</span>
-                    </div>
-                    <p class="footer-text">Excellence in luxury vehicle brokerage</p>
+        <div class="footer-container">
+            <div class="footer-brand">
+            <div class="footer-logo">
+                <div class="social-icons">
+                <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
+                <a href="https://www.linkedin.com/company/nordlion-international/?viewAsMember=true" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
                 </div>
-                
-                <div class="footer-links">
-                    <h4 class="footer-heading">Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="onmarket.html">Cars</a></li>
-                        <li><a href="jets.html">Jets</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h4 class="footer-heading">Services</h4>
-                    <ul>
-                        <li><a href="#">Vehicle Acquisition</a></li>
-                        <li><a href="#">Jet Brokerage</a></li>
-                        <li><a href="#">Off-Market Access</a></li>
-                        <li><a href="#">Investment Consulting</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h4 class="footer-heading">Legal</h4>
-                    <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
-                    </ul>
-                </div>
+                <img src="img/logo-2.png" alt="NordLion Logo">
+                <span class="footer-logo-text">NordLion International</span>
             </div>
-            
-            <div class="copyright">
-                <p>&copy; 2025 NordLion International. All rights reserved.</p>
+            <p class="footer-text">Excellence in luxury vehicle brokerage.</p>
             </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Quick Links</h4>
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="onmarket.php">Cars</a></li>
+                <li><a href="offmarket.php">Off Market</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Services</h4>
+            <ul>
+                <li><a href="onmarket.php">Vehicle Acquisition</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="offmarket.php">Off-Market Access</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Legal</h4>
+            <ul>
+                <li><a href="privacy.php">Privacy Policy</a></li>
+                <li><a href="terms.php">Terms of Service</a></li>
+                <li><a href="cookie.php">Cookie Policy</a></li>
+            </ul>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>&copy; 2025 NordLion International. All rights reserved.</p>
+        </div>
         </div>
     </footer>
 

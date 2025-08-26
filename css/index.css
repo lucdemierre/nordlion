@@ -699,3 +699,36 @@ nav {
   }
 }
 
+/* Unify select styling to match contact.php on every page */
+select.form-input,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  padding-right: 40px;               /* room for the custom arrow */
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: 'Lato', sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+  background-color: #fff;
+
+  /* kill native appearance across browsers */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* same chevron as contact.css */
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath fill='%230F2C59' d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 12px;
+
+  transition: var(--transition);
+}
+
+select.form-input:focus,
+.form-group select:focus {
+  border-color: var(--secondary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(200, 164, 94, .15); /* optional, matches focus glow */
+}

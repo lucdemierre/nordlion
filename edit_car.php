@@ -127,6 +127,58 @@ $images = $imageStmt->fetchAll(PDO::FETCH_ASSOC);
   <?php endif; ?>
 </main>
 
+<footer class="footer" style="background-color: #0F2C59;">
+        <div class="container">
+        <div class="footer-container">
+            <div class="footer-brand">
+            <div class="footer-logo">
+                <div class="social-icons">
+                <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
+                <a href="https://www.linkedin.com/company/nordlion-international/?viewAsMember=true" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
+                </div>
+                <img src="img/logo-2.png" alt="NordLion Logo">
+                <span class="footer-logo-text">NordLion International</span>
+            </div>
+            <p class="footer-text">Excellence in luxury vehicle brokerage.</p>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Quick Links</h4>
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="onmarket.php">Cars</a></li>
+                <li><a href="offmarket.php">Off Market</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Services</h4>
+            <ul>
+                <li><a href="onmarket.php">Vehicle Acquisition</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="offmarket.php">Off-Market Access</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Legal</h4>
+            <ul>
+                <li><a href="privacy.php">Privacy Policy</a></li>
+                <li><a href="terms.php">Terms of Service</a></li>
+                <li><a href="cookie.php">Cookie Policy</a></li>
+            </ul>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>&copy; 2025 NordLion International. All rights reserved.</p>
+        </div>
+        </div>
+    </footer>
+
 <script>
 function addImageInput() {
   const container = document.getElementById('image-list');

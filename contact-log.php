@@ -1,6 +1,85 @@
-<?php
-session_start();
-$is_logged_in = isset($_SESSION['user_id']); // Adjust this to match your login session key
+<?php 
+session_start(); 
+$is_logged_in = isset($_SESSION['user_id']);
+
+// Database connection
+require_once 'php/db.php';
+
+// Fetch inquiry types from database
+$inquiry_types = [];
+try {
+    $stmt = $pdo->query("SELECT DISTINCT type, subject FROM inquiries WHERE status = 'new' ORDER BY subject");
+
+} catch (PDOException $e) {
+    // If there's an error, use default types as fallback
+    $inquiry_types = [
+        ['type' => 'car', 'subject' => 'Car Inquiry'],
+        ['type' => 'jet', 'subject' => 'Jet Inquiry'],
+        ['type' => 'investment', 'subject' => 'Investment Opportunity'],
+        ['type' => 'general', 'subject' => 'General Inquiry'],
+        ['type' => 'other', 'subject' => 'Other']
+    ];
+}
+
+// Process form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $inquiry_type = $_POST['inquiry_type'] ?? '';
+    $message = $_POST['message'] ?? '';
+    $user_id = $_SESSION['user_id'] ?? null;
+    
+    try {
+        $stmt = $pdo->prepare("INSERT INTO inquiries (user_id, type, message, status) VALUES (?, ?, ?, 'new')");
+        $stmt->execute([$user_id, $inquiry_type, $message]);
+        
+        // You can add email notification here if needed
+        
+        $success_message = "Thank you for your inquiry. We'll get back to you soon!";
+    } catch (PDOException $e) {
+        $error_message = "There was an error submitting your inquiry. Please try again.";
+    }
+}
+
+// Check if user is logged in
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName   = $isLoggedIn ? ($_SESSION['user_name'] ?? '') : '';
+$userRole   = $isLoggedIn ? ($_SESSION['user_role'] ?? '') : '';
+
+
+// Default values
+$email = '';
+$firstName = '';
+
+// If logged in, try to get email from session or database
+if ($isLoggedIn) {
+    if (!empty($_SESSION['user_email'])) {
+        $email = $_SESSION['user_email'];
+    } else {
+        // Optional: fetch from database if not stored in session
+        $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $dbEmail = $stmt->fetchColumn();
+        if ($dbEmail) {
+            $email = $dbEmail;
+            $_SESSION['user_email'] = $dbEmail; // cache for next time
+        }
+    }
+}
+
+// If form was submitted, keep the posted email instead
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'] ?? $email;
+}
+
+// Get first name from full name if available
+if (!empty($userName)) {
+    $nameParts = explode(' ', $userName);
+    $firstName = $nameParts[0];
+}
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,16 +101,16 @@ $is_logged_in = isset($_SESSION['user_id']); // Adjust this to match your login 
             </a>
             <nav>
                 <ul id="nav-menu">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.php">Home</a></li>
                     <li><a href="onmarket.php">Cars</a></li>
-                    <li><a href="jets.html">Jets</a></li>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="team.html">Team</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="login.html">Login</a></li>
-                <?php if ($is_logged_in): ?>
+                    <li><a href="jets.php">Jets</a></li>
+                    <li><a href="about.php">About Us</a></li>
+                    <li><a href="team.php">Team</a></li>
+                    <li><a href="contact.php">Contact</a></li><?php if ($is_logged_in): ?>
     <li><a href="logout.php">Logout</a></li>
-<?php endif; ?></ul>
+                    <?php else: ?>           
+                    <li><a href="login.html">Login</a></li><?php endif; ?>
+                </ul>
                 <button class="mobile-menu-btn" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -50,38 +129,86 @@ $is_logged_in = isset($_SESSION['user_id']); // Adjust this to match your login 
         <section class="contact section-padding">
             <div class="container">
                 
+
+
 <?php if ($is_logged_in): ?>
 <div class="contact-container">
-    <div class="contact-info">
-        <h3 class="contact-heading">Get In Touch</h3>
-        <p class="contact-text">Interested in our services or have a specific vehicle in mind? Our team is ready to assist you with any inquiries.</p>
+                    <div class="contact-info">
+                        <h3 class="contact-heading">Get In Touch</h3>
+                        <p class="contact-text">Interested in our services or have a specific vehicle in mind? Our team is ready to assist you with any inquiries.</p>
+                        
+                        <div class="contact-item">
+                            <span class="contact-icon">📍</span>
+                            <span class="contact-detail">London, United Kingdom - Singapore, Singapore - Turku, Finland</span>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <span class="contact-icon">📱</span>
+                            <span class="contact-detail">+44 7947 977474</span>
+                        </div>
 
-        <div class="contact-item"><span class="contact-icon">📍</span><span class="contact-detail">London, United Kingdom - Singapore, Singapore - Turku, Finland</span></div>
-        <div class="contact-item"><span class="contact-icon">📱</span><span class="contact-detail">+44 7947 977474</span></div>
-        <div class="contact-item"><span class="contact-icon">✉️</span><span class="contact-detail">lucdemierre@hotmail.com - eliel.valkama@gmail.com</span></div>
-        <div class="contact-item"><span class="contact-icon">⏰</span><span class="contact-detail">Mon-Sat: 4:00 PM - 10:00 PM GMT </span></div>
-    </div>
 
-    <div class="contact-form">
-        <form id="inquiry-form" action="contact.php" method="POST">
-            <div class="form-group"><label for="name" class="form-label">Full Name</label><input type="text" id="name" name="name" class="form-input" required></div>
-            <div class="form-group"><label for="email" class="form-label">Email Address</label><input type="email" id="email" name="email" class="form-input" required></div>
-            <div class="form-group"><label for="phone" class="form-label">Phone Number</label><input type="tel" id="phone" name="phone" class="form-input"></div>
-            <div class="form-group">
-                <label for="subject" class="form-label">Subject</label>
-                <select id="subject" name="subject" class="form-input" required>
-                    <option value="">Select a subject</option>
-                    <option value="vehicle">Vehicle Inquiry</option>
-                    <option value="jet">Private Jet Inquiry</option>
-                    <option value="investment">Investment Consultation</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-            <div class="form-group"><label for="message" class="form-label">Message</label><textarea id="message" name="message" class="form-textarea" required></textarea></div>
-            <button type="submit" class="btn btn-primary">Send Message</button>
-        </form>
-    </div>
-</div>
+                    <div class="contact-item">
+                            <span class="contact-icon">✉️</span>
+                            <span class="contact-detail">lucdemierre@hotmail.com - eliel.valkama@gmail.com</span>
+                        </div>
+
+                        <div class="contact-item">
+                            <span class="contact-icon">⏰</span>
+                            <span class="contact-detail">Mon-Sat: 4:00 PM - 10:00 PM GMT </span>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="contact-form">
+                        <form id="inquiry-form" action="contact.php" method="POST">
+                            <div class="form-group">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" id="name" name="name" required value="<?php echo htmlspecialchars($userName); ?>">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="text" id="email" name="email" required value="<?php echo htmlspecialchars($email); ?>">
+                            </div>
+                            
+
+                            <?php if (isset($success_message)): ?>
+                                <div class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                                    <?php echo htmlspecialchars($success_message); ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if (isset($error_message)): ?>
+                                <div class="alert alert-danger" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                                    <?php echo htmlspecialchars($error_message); ?>
+                                </div>
+                            <?php endif; ?>
+                            <div class="form-group">
+                                <label for="inquiry_type" class="form-label">Inquiry Type</label>
+                                <select id="inquiry_type" name="inquiry_type" class="form-input" required>
+                                    <option value="">Select an inquiry type</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="car">Car Inquiry</option>
+                                    <option value="jet">Jet Inquiry</option>
+                                    <option value="investment">Investment Opportunity</option>
+                                    <option value="other">Other</option>
+                                    <?php foreach ($inquiry_types as $type): ?>
+                                        <option value="<?php echo htmlspecialchars($type['type']); ?>">
+                                            <?php echo htmlspecialchars($type['subject']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea id="message" name="message" class="form-textarea" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
 <?php else: ?>
 <div class="contact-center">
     <h3>Get In Touch</h3>
@@ -95,50 +222,8 @@ $is_logged_in = isset($_SESSION['user_id']); // Adjust this to match your login 
 </div>
 <?php endif; ?>
 
-
-                        <div class="contact-item">
-                            <span class="contact-icon">⏰</span>
-                            <span class="contact-detail">Mon-Sat: 4:00 PM - 10:00 PM GMT </span>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-form">
-                        <form id="inquiry-form" action="#" method="POST">
-                            <div class="form-group">
-                                <label for="name" class="form-label">Full Name</label>
-                                <input type="text" id="name" name="name" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="email" class="form-label">Email Address</label>
-                                <input type="email" id="email" name="email" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="phone" class="form-label">Phone Number</label>
-                                <input type="tel" id="phone" name="phone" class="form-input">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="subject" class="form-label">Subject</label>
-                                <select id="subject" name="subject" class="form-input" required>
-                                    <option value="">Select a subject</option>
-                                    <option value="vehicle">Vehicle Inquiry</option>
-                                    <option value="jet">Private Jet Inquiry</option>
-                                    <option value="investment">Investment Consultation</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="message" class="form-label">Message</label>
-                                <textarea id="message" name="message" class="form-textarea" required></textarea>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">Send Message</button>
-                        </form>
-                    </div>
-                </div>
+                        
+                        
 
                 <!-- Office Locations Section -->
                 <div class="office-locations" style="margin-top: 80px;">
@@ -212,7 +297,7 @@ $is_logged_in = isset($_SESSION['user_id']); // Adjust this to match your login 
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer" style="background-color: #0F2C59;">
         <div class="container">
             <div class="footer-container">
                 <div class="footer-brand">
@@ -230,11 +315,13 @@ $is_logged_in = isset($_SESSION['user_id']); // Adjust this to match your login 
                 <div class="footer-links">
                     <h4 class="footer-heading">Quick Links</h4>
                     <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="onmarket.html">Cars</a></li>
-                        <li><a href="jets.html">Jets</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="onmarket.php">Cars</a></li>
+                        <li><a href="jets.php">Jets</a></li>
+                        <li><a href="about.php">About Us</a></li>
+                        <li><a href="contact.php">Contact</a></li><?php if ($is_logged_in): ?>
+    <li><a href="logout.php">Logout</a></li>
+<?php endif; ?>
                     </ul>
                 </div>
                 
@@ -273,48 +360,6 @@ $is_logged_in = isset($_SESSION['user_id']); // Adjust this to match your login 
                 header.classList.add('scrolled');
             } else {
                 header.classList.remove('scrolled');
-            }
-        });
-
-        // Contact form submission
-        document.getElementById('inquiry-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.textContent;
-            submitButton.textContent = 'Sending...';
-            submitButton.disabled = true;
-
-            try {
-                const formData = {
-                    name: document.getElementById('name').value,
-                    email: document.getElementById('email').value,
-                    phone: document.getElementById('phone').value,
-                    subject: document.getElementById('subject').value,
-                    message: document.getElementById('message').value
-                };
-
-                const response = await fetch('http://localhost:3000/api/contact', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert('Message sent successfully! We will get back to you soon.');
-                    this.reset();
-                } else {
-                    throw new Error(data.error || 'Failed to send message');
-                }
-            } catch (error) {
-                alert('Error: ' + error.message);
-            } finally {
-                submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
             }
         });
     </script>

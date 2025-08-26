@@ -419,8 +419,6 @@ nav {
 .contact-items {
     display: flex;
     justify-content: center;
-    gap: 2rem;
-    margin-top: 2rem;
     font: 'Lato';
 }
 
@@ -429,8 +427,7 @@ nav {
 }
 
 .centered-item .icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    font-size: 2rem;
     color: var(--primary-color);
 }
 
@@ -581,22 +578,19 @@ nav {
 }
 
 .contact-items {
-  margin-top: 50px;
+  margin-top: 30px;
   width: 100% !important;
   text-align: center !important;
   display: block !important;
-  padding: 10px 0;
 }
 
 .centered-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 40px;
-  font-size: 1.4rem;
-  line-height: 1.6;
+  font-size: 1.25rem;
+  line-height: 1.5;
   letter-spacing: 0.3px;
-  padding: 10px 0;
 }
 
 .centered-item .icon {
@@ -619,6 +613,7 @@ nav {
 
 .contact-text {
   margin-bottom: 30px;
+  font-size: 1.1rem;
 }
 
 .contact-item {
@@ -634,7 +629,7 @@ nav {
 }
 
 .contact-detail {
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 /* Office locations, business hours, and FAQ styling - Essential for the page */

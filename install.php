@@ -152,8 +152,8 @@ try {
     echo "<h2>✅ Database schema created successfully!</h2>";
     echo "<p>Default admin credentials:</p>";
     echo "<ul>";
-    echo "<li>Email: admin@nordlion.com</li>";
-    echo "<li>Password: admin123</li>";
+    echo "<li>Email: lucdemierre@hotmail.com</li>";
+    echo "<li>Password: spocky2008</li>";
     echo "</ul>";
     echo "<p class='warning'>⚠️ IMPORTANT: Change the default admin password after first login!</p>";
     echo "<style>

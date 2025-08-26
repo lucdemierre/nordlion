@@ -1,5 +1,101 @@
 <?php
+session_start();
 require 'php/db.php';
+require_once 'php/session_check.php';
+
+// --- Prefill Full Name + Email (like contact.php) ---
+$prefillName  = '';
+$prefillEmail = '';
+
+if ($isLoggedIn) {
+    // name from session first
+    $prefillName = $_SESSION['user_name'] ?? '';
+
+    // email from session cache or DB
+    if (!empty($_SESSION['user_email'])) {
+        $prefillEmail = $_SESSION['user_email'];
+    } else {
+        $u = $pdo->prepare("SELECT name, email FROM users WHERE id = ? LIMIT 1");
+        $u->execute([$_SESSION['user_id']]);
+        if ($row = $u->fetch(PDO::FETCH_ASSOC)) {
+            if (empty($prefillName) && !empty($row['name'])) {
+                $prefillName = $row['name'];
+                $_SESSION['user_name'] = $row['name']; // cache for later
+            }
+            if (!empty($row['email'])) {
+                $prefillEmail = $row['email'];
+                $_SESSION['user_email'] = $row['email']; // cache for later
+            }
+        }
+    }
+}
+
+// If the form was just submitted and you redirected back with an error,
+// keep whatever the user typed instead of overwriting with session/DB.
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $prefillName  = $_POST['name']  ?? $prefillName;
+    $prefillEmail = $_POST['email'] ?? $prefillEmail;
+}
+
+
+/* -------------------- Handle inquiry submit (POST) -------------------- */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['car_id'])) {
+    // must be logged in
+    if (!isset($_SESSION['user_id'])) {
+        $next = 'car_details.php?id='.(int)($_POST['car_id']).'#enquiry';
+        header('Location: login.html?next='.urlencode($next));
+        exit;
+    }
+
+    $user_id = (int)$_SESSION['user_id'];
+    $car_id  = (int)($_POST['car_id'] ?? 0);
+    $name    = trim($_POST['name'] ?? '');
+    $email   = trim($_POST['email'] ?? '');
+    $message = trim($_POST['message'] ?? '');
+
+    if ($car_id <= 0 || $message === '') {
+        header('Location: car_details.php?id='.$car_id.'#enquiry&error=missing');
+        exit;
+    }
+
+    // verify the car exists and get its name/model for the subject
+    try {
+        $c = $pdo->prepare("SELECT name, model FROM cars WHERE id = ? LIMIT 1");
+        $c->execute([$car_id]);
+        $carRow = $c->fetch(PDO::FETCH_ASSOC);
+        if (!$carRow) {
+            header('Location: car_details.php?id='.$car_id.'#enquiry&error=car_not_found');
+            exit;
+        }
+    } catch (Exception $e) {
+        header('Location: car_details.php?id='.$car_id.'#enquiry&error=db');
+        exit;
+    }
+
+    $subject = trim(($carRow['name'] ?? '').' '.($carRow['model'] ?? ''));
+
+    // include sender line so staff sees contact even if not in DB schema
+    $finalMessage = $message;
+    if ($name || $email) {
+        $senderLine = "From: ".trim($name.($email ? " <{$email}>" : ''));
+        $finalMessage = $senderLine."\n\n".$message;
+    }
+
+    try {
+        // INSERT into inquiries with type=car and car_id
+        $ins = $pdo->prepare("
+            INSERT INTO inquiries (user_id, type, subject, message, car_id, status)
+            VALUES (?, 'car', ?, ?, ?, 'new')
+        ");
+        $ins->execute([$user_id, $subject, $finalMessage, $car_id]);
+
+        header('Location: car_details.php?id='.$car_id.'#enquiry&sent=1');
+        exit;
+    } catch (PDOException $e) {
+        header('Location: car_details.php?id='.$car_id.'#enquiry&error=insert');
+        exit;
+    }
+}
 
 if (!isset($_GET['id'])) {
     die("Car ID not specified.");
@@ -24,6 +120,16 @@ if (!$gallery_images) {
     $gallery_images = [];
 }
 
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName = $isLoggedIn ? $_SESSION['user_name'] : '';
+$userRole = $isLoggedIn ? $_SESSION['user_role'] : '';
+
+$firstName = '';
+if ($isLoggedIn && !empty($userName)) {
+    $nameParts = explode(' ', $userName);
+    $firstName = $nameParts[0];
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -33,7 +139,7 @@ if (!$gallery_images) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?> | NordLion International</title>
   <link rel="icon" type="image/x-icon" href="img/logo-2.png">
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/detail.css" />
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
@@ -46,18 +152,27 @@ if (!$gallery_images) {
       </a>
       <nav>
         <ul id="nav-menu">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="onmarket.php">Cars</a></li>
-            <li><a href="jets.html">Jets</a></li>
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="team.html">Team</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="login.html">Login</a></li>
+          <li><a href="index.php" class="active">Home</a></li>
+          <li><a href="onmarket.php">Cars</a></li>
+          <li><a href="offmarket.php">Off Market</a></li>
+          <li><a href="about.php">About Us</a></li>
+          <li><a href="team.html">Our Team</a></li>
+          <li><a href="contact.php">Contact</a></li>
+            <?php if ($isLoggedIn): ?>
+                <?php if ($userRole === 'admin'): ?>
+                    <li><a href="dashboard.php">Admin Panel</a></li>
+                <?php elseif ($userRole === 'vc'): ?>
+                    <li><a href="vc_dashboard.php">VC Panel</a></li>
+                <?php endif; ?>
+                <li><a href="logout.php">Logout</a></li>
+            <?php else: ?>
+                <li><a href="login.html">Login</a></li>
+            <?php endif; ?>
         </ul>
         <button class="mobile-menu-btn" aria-label="Toggle menu">
             <i class="fas fa-bars"></i>
         </button>
-      </nav>
+    </nav>
     </div>
   </header>
 
@@ -105,18 +220,18 @@ if (!$gallery_images) {
 
 
   <!-- Car Info -->
-  <main class="jet-main">
-    <section class="jet-overview">
+  <main class="car-main">
+    <section class="car-overview">
       <div class="overview-content">
-        <h1 class="jet-title"><?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?></h1>
-        <div class="jet-price">€<?php echo number_format($car['price']); ?></div>
-        <p class="jet-description">
+        <h1 class="car-title"><?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?></h1>
+        <div class="car-price">€<?php echo number_format($car['price']); ?></div>
+        <p class="car-description">
           <?php echo nl2br(htmlspecialchars($car['description'])); ?>
         </p>
       </div>
     </section>
 
-    <section class="jet-specifications">
+    <section class="car-specifications">
       <h2 class="section-title">Key Specifications</h2>
       <div class="specs-grid">
         <div class="spec-item">
@@ -151,7 +266,7 @@ if (!$gallery_images) {
     </section>
 
     <?php if (!empty($car['features'])): ?>
-  <section class="jet-features">
+  <section class="car-features">
     <h2 class="section-title">Exceptional Features</h2>
     <ul class="features-grid">
       <?php foreach (explode("\n", trim($car['features'])) as $feature): ?>
@@ -169,19 +284,20 @@ if (!$gallery_images) {
     <div class="inquiry-left">
       <div class="inquiry-form">
         <h2>Enquire About <?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?></h2>
-        <form action="php/submit_inquiry.php" method="POST" autocomplete="on" aria-label="Enquiry form for <?php echo htmlspecialchars($car['name'] . ' ' . $car['model']); ?>">
-          <input type="hidden" name="car_id" value="<?php echo $car['id']; ?>">
+        <form action="car_details.php?id=<?php echo (int)$car['id']; ?>#enquiry" method="POST" autocomplete="on">
+          <input type="hidden" name="car_id" value="<?php echo (int)$car['id']; ?>">
           <div class="form-group">
             <label for="name" class="form-label">Full Name</label>
-            <input type="text" id="name" name="name" class="form-input" required autocomplete="name" />
+            <input type="text" id="name" name="name"
+                  class="form-input" required autocomplete="name"
+                  value="<?php echo htmlspecialchars($prefillName); ?>">
           </div>
+
           <div class="form-group">
             <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" name="email" class="form-input" required autocomplete="email" />
-          </div>
-          <div class="form-group">
-            <label for="phone" class="form-label">Phone Number</label>
-            <input type="tel" id="phone" name="phone" class="form-input" autocomplete="tel" />
+            <input type="email" id="email" name="email"
+                  class="form-input" required autocomplete="email"
+                  value="<?php echo htmlspecialchars($prefillEmail); ?>">
           </div>
           <div class="form-group">
             <label for="message" class="form-label">Message</label>
@@ -209,59 +325,57 @@ if (!$gallery_images) {
     </div>
   </section>
 
-  <footer class="footer">
-    <div class="container">
+  <footer class="footer" style="background-color: #0F2C59;">
+        <div class="container">
         <div class="footer-container">
             <div class="footer-brand">
-                <div class="footer-logo">
-                  <div class="social-icons">
-                    <a href="https://www.instagram.com/the_nordlion_international/" target="_blank" aria-label="Instagram">
-                      <img src="img/insta.png" alt="Instagram Logo" />
-                    </a>
-                    <a href="https://www.linkedin.com/company/nordlion-international/" target="_blank" aria-label="LinkedIn">
-                      <img src="img/linkedin.png" alt="LinkedIn Logo" />
-                    </a>
-                  </div>
-                  <img src="img/logo-2.png" alt="NordLion Logo" />
-                  <span class="footer-logo-text">NordLion International</span>
+            <div class="footer-logo">
+                <div class="social-icons">
+                <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
+                <a href="https://www.linkedin.com/company/nordlion-international/?viewAsMember=true" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
                 </div>
-                <p class="footer-text">
-                  Connecting discerning clients with the world's most extraordinary vehicles and jets.
-                </p>
+                <img src="img/logo-2.png" alt="NordLion Logo">
+                <span class="footer-logo-text">NordLion International</span>
             </div>
-            <div class="footer-links">
-                <h4 class="footer-heading">Quick Links</h4>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="onmarket.php">Cars</a></li>
-                    <li><a href="jets.html">Jets</a></li>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
+            <p class="footer-text">Excellence in luxury vehicle brokerage.</p>
             </div>
+
             <div class="footer-links">
-                <h4 class="footer-heading">Services</h4>
-                <ul>
-                    <li><a href="#">Vehicle Acquisition</a></li>
-                    <li><a href="#">Jet Brokerage</a></li>
-                    <li><a href="#">Off-Market Access</a></li>
-                    <li><a href="#">Investment Consulting</a></li>
-                </ul>
+            <h4 class="footer-heading">Quick Links</h4>
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="onmarket.php">Cars</a></li>
+                <li><a href="offmarket.php">Off Market</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
             </div>
+
             <div class="footer-links">
-                <h4 class="footer-heading">Legal</h4>
-                <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Cookie Policy</a></li>
-                </ul>
+            <h4 class="footer-heading">Services</h4>
+            <ul>
+                <li><a href="onmarket.php">Vehicle Acquisition</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="offmarket.php">Off-Market Access</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Legal</h4>
+            <ul>
+                <li><a href="privacy.php">Privacy Policy</a></li>
+                <li><a href="terms.php">Terms of Service</a></li>
+                <li><a href="cookie.php">Cookie Policy</a></li>
+            </ul>
             </div>
         </div>
+
         <div class="copyright">
             <p>&copy; 2025 NordLion International. All rights reserved.</p>
         </div>
-    </div>
-  </footer>
+        </div>
+    </footer>
 
   <script src="scripts.js"></script>
   <script>

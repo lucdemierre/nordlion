@@ -251,7 +251,7 @@ nav {
 
 /* About/Team Hero Section */
 .about-hero {
-  background: linear-gradient(rgba(15, 44, 89, 0.8), rgba(15, 44, 89, 0.8)), url('../img/team-1.jpg');
+  background: linear-gradient(rgba(15, 44, 89, 0.8), rgba(15, 44, 89, 0.8)), url('../img/egg-2.jpeg');
   background-size: cover;
   background-position: center 60%; /* Changed from center top to center 40% to show more of the car */
   color: var(--light-text);

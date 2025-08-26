@@ -9,7 +9,7 @@ require_once 'php/db.php';
 $inquiry_types = [];
 try {
     $stmt = $pdo->query("SELECT DISTINCT type, subject FROM inquiries WHERE status = 'new' ORDER BY subject");
-    $inquiry_types = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 } catch (PDOException $e) {
     // If there's an error, use default types as fallback
     $inquiry_types = [
@@ -25,14 +25,13 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
     $email = $_POST['email'] ?? '';
-    $phone = $_POST['phone'] ?? '';
     $inquiry_type = $_POST['inquiry_type'] ?? '';
     $message = $_POST['message'] ?? '';
     $user_id = $_SESSION['user_id'] ?? null;
     
     try {
-        $stmt = $pdo->prepare("INSERT INTO inquiries (user_id, type, subject, message, status) VALUES (?, ?, ?, ?, 'new')");
-        $stmt->execute([$user_id, $inquiry_type, $inquiry_type . ' Inquiry', $message]);
+        $stmt = $pdo->prepare("INSERT INTO inquiries (user_id, type, message, status) VALUES (?, ?, ?, 'new')");
+        $stmt->execute([$user_id, $inquiry_type, $message]);
         
         // You can add email notification here if needed
         
@@ -41,6 +40,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "There was an error submitting your inquiry. Please try again.";
     }
 }
+
+// Check if user is logged in
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName   = $isLoggedIn ? ($_SESSION['user_name'] ?? '') : '';
+$userRole   = $isLoggedIn ? ($_SESSION['user_role'] ?? '') : '';
+
+
+// Default values
+$email = '';
+$firstName = '';
+
+// If logged in, try to get email from session or database
+if ($isLoggedIn) {
+    if (!empty($_SESSION['user_email'])) {
+        $email = $_SESSION['user_email'];
+    } else {
+        // Optional: fetch from database if not stored in session
+        $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $dbEmail = $stmt->fetchColumn();
+        if ($dbEmail) {
+            $email = $dbEmail;
+            $_SESSION['user_email'] = $dbEmail; // cache for next time
+        }
+    }
+}
+
+// If form was submitted, keep the posted email instead
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'] ?? $email;
+}
+
+// Get first name from full name if available
+if (!empty($userName)) {
+    $nameParts = explode(' ', $userName);
+    $firstName = $nameParts[0];
+}
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,21 +95,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <header id="header">
         <div class="header-container">
-            <a href="index.html" class="logo">
+            <a href="index.php" class="logo">
                 <img src="img/logo-2.png" alt="NordLion Logo">
                 <span class="logo-text">NordLion International</span>
             </a>
             <nav>
                 <ul id="nav-menu">
-                    <li><a href="index.php">Home</a></li>
+                    <li><a href="index.php" class="active">Home</a></li>
                     <li><a href="onmarket.php">Cars</a></li>
-                    <li><a href="jets.php">Jets</a></li>
+                    <li><a href="offmarket.php">Off Market</a></li>
                     <li><a href="about.php">About Us</a></li>
-                    <li><a href="team.php">Team</a></li>
-                    <li><a href="contact.php">Contact</a></li><?php if ($is_logged_in): ?>
-    <li><a href="logout.php">Logout</a></li>
-                    <?php else: ?>           
-                    <li><a href="login.html">Login</a></li><?php endif; ?>
+                    <li><a href="team.php">Our Team</a></li>
+                    <li><a href="contact.php">Contact</a></li>
+                    <?php if ($isLoggedIn): ?>
+                        <?php if ($userRole === 'admin'): ?>
+                            <li><a href="dashboard.php">Admin Panel</a></li>
+                        <?php elseif ($userRole === 'vc'): ?>
+                            <li><a href="vc_dashboard.php">VC Panel</a></li>
+                        <?php endif; ?>
+                        <li><a href="logout.php">Logout</a></li>
+                    <?php else: ?>
+                        <li><a href="login.html">Login</a></li>
+                    <?php endif; ?>
                 </ul>
                 <button class="mobile-menu-btn" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
@@ -122,21 +168,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     
                     <div class="contact-form">
-                        <form id="inquiry-form" action="" method="POST">
+                        <form id="inquiry-form" action="contact.php" method="POST">
                             <div class="form-group">
                                 <label for="name" class="form-label">Full Name</label>
-                                <input type="text" id="name" name="name" class="form-input" required>
+                                <input type="text" id="name" name="name" required value="<?php echo htmlspecialchars($userName); ?>">
                             </div>
                             
                             <div class="form-group">
                                 <label for="email" class="form-label">Email Address</label>
-                                <input type="email" id="email" name="email" class="form-input" required>
+                                <input type="text" id="email" name="email" required value="<?php echo htmlspecialchars($email); ?>">
                             </div>
                             
-                            <div class="form-group">
-                                <label for="phone" class="form-label">Phone Number</label>
-                                <input type="tel" id="phone" name="phone" class="form-input">
-                            </div>
 
                             <?php if (isset($success_message)): ?>
                                 <div class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
@@ -152,6 +194,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label for="inquiry_type" class="form-label">Inquiry Type</label>
                                 <select id="inquiry_type" name="inquiry_type" class="form-input" required>
                                     <option value="">Select an inquiry type</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="car">Car Inquiry</option>
+                                    <option value="jet">Jet Inquiry</option>
+                                    <option value="investment">Investment Opportunity</option>
+                                    <option value="other">Other</option>
                                     <?php foreach ($inquiry_types as $type): ?>
                                         <option value="<?php echo htmlspecialchars($type['type']); ?>">
                                             <?php echo htmlspecialchars($type['subject']); ?>
@@ -259,57 +306,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <footer class="footer" style="background-color: #0F2C59;">
         <div class="container">
-            <div class="footer-container">
-                <div class="footer-brand">
-                    <div class="footer-logo">
-                        <div class="social-icons">
-                            <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
-                            <a href="https://www.linkedin.com/company/nordlion-international/" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
-                        </div>
-                        <img src="img/logo-2.png" alt="NordLion Logo">
-                        <span class="footer-logo-text">NordLion International</span>
-                    </div>
-                    <p class="footer-text">Excellence in luxury vehicle brokerage</p>
+        <div class="footer-container">
+            <div class="footer-brand">
+            <div class="footer-logo">
+                <div class="social-icons">
+                <a href="https://www.instagram.com/the_nordlion_international/" target="_blank"><img src="img/insta.png" alt="Instagram"></a>
+                <a href="https://www.linkedin.com/company/nordlion-international/?viewAsMember=true" target="_blank"><img src="img/linkedin.png" alt="LinkedIn"></a>
                 </div>
-                
-                <div class="footer-links">
-                    <h4 class="footer-heading">Quick Links</h4>
-                    <ul>
-                        <li><a href="index.php">Home</a></li>
-                        <li><a href="onmarket.php">Cars</a></li>
-                        <li><a href="jets.php">Jets</a></li>
-                        <li><a href="about.php">About Us</a></li>
-                        <li><a href="contact.php">Contact</a></li><?php if ($is_logged_in): ?>
-    <li><a href="logout.php">Logout</a></li>
-<?php endif; ?>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h4 class="footer-heading">Services</h4>
-                    <ul>
-                        <li><a href="#">Vehicle Acquisition</a></li>
-                        <li><a href="#">Jet Brokerage</a></li>
-                        <li><a href="#">Off-Market Access</a></li>
-                        <li><a href="#">Investment Consulting</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-links">
-                    <h4 class="footer-heading">Legal</h4>
-                    <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
-                    </ul>
-                </div>
+                <img src="img/logo-2.png" alt="NordLion Logo">
+                <span class="footer-logo-text">NordLion International</span>
             </div>
-            
-            <div class="copyright">
-                <p>&copy; 2025 NordLion International. All rights reserved.</p>
+            <p class="footer-text">Excellence in luxury vehicle brokerage.</p>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Quick Links</h4>
+            <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="onmarket.php">Cars</a></li>
+                <li><a href="offmarket.php">Off Market</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Services</h4>
+            <ul>
+                <li><a href="onmarket.php">Vehicle Acquisition</a></li>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="offmarket.php">Off-Market Access</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            </div>
+
+            <div class="footer-links">
+            <h4 class="footer-heading">Legal</h4>
+            <ul>
+                <li><a href="privacy.php">Privacy Policy</a></li>
+                <li><a href="terms.php">Terms of Service</a></li>
+                <li><a href="cookie.php">Cookie Policy</a></li>
+            </ul>
             </div>
         </div>
+
+        <div class="copyright">
+            <p>&copy; 2025 NordLion International. All rights reserved.</p>
+        </div>
+        </div>
     </footer>
+
+
+    
 
     <script src="js/main.js"></script>
     <script>
@@ -320,48 +368,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header.classList.add('scrolled');
             } else {
                 header.classList.remove('scrolled');
-            }
-        });
-
-        // Contact form submission
-        document.getElementById('inquiry-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.textContent;
-            submitButton.textContent = 'Sending...';
-            submitButton.disabled = true;
-
-            try {
-                const formData = {
-                    name: document.getElementById('name').value,
-                    email: document.getElementById('email').value,
-                    phone: document.getElementById('phone').value,
-                    subject: document.getElementById('subject').value,
-                    message: document.getElementById('message').value
-                };
-
-                const response = await fetch('http://localhost:3000/api/contact', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert('Message sent successfully! We will get back to you soon.');
-                    this.reset();
-                } else {
-                    throw new Error(data.error || 'Failed to send message');
-                }
-            } catch (error) {
-                alert('Error: ' + error.message);
-            } finally {
-                submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
             }
         });
     </script>

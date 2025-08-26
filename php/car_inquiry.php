@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 require_once 'db.php';
 
 // Process form submission
@@ -24,26 +25,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     // Common fields
-    $vehicleId = $_POST['vehicle'] ?? '';
+    $vehicleName = $_POST['vehicle'] ?? '';
     $message = $_POST['message'] ?? '';
     
     // Validate required fields
-    if (empty($vehicleId) || empty($message)) {
+    if (empty($vehicleName) || empty($message)) {
         header("Location: ../onmarket.php?status=error&message=" . urlencode("Please fill in all required fields."));
         exit;
     }
     
     try {
         // Get vehicle name for record
-        $vehicleStmt = $pdo->prepare("SELECT name, model FROM cars WHERE id = ?");
-        $vehicleStmt->execute([$vehicleId]);
-        $vehicle = $vehicleStmt->fetch(PDO::FETCH_ASSOC);
-        $vehicleName = $vehicle ? ($vehicle['name'] . ' ' . $vehicle['model']) : 'Unknown Vehicle';
+       // $vehicleStmt = $pdo->prepare("SELECT name, model FROM cars WHERE id = ?");
+        //$vehicleStmt->execute([$vehicleId]);
+        //$vehicle = $vehicleStmt->fetch(PDO::FETCH_ASSOC);
+        //$vehicleName = $vehicle ? ($vehicle['name'] . ' ' . $vehicle['model']) : 'Unknown Vehicle';
         
         // Insert inquiry into database
-        $stmt = $pdo->prepare("INSERT INTO car_inquiries (user_id, name, email, vehicle_id, vehicle_name, message, status, created_at) 
-                               VALUES (?, ?, ?, ?, ?, ?, 'new', NOW())");
-        $stmt->execute([$userId, $name, $email, $vehicleId, $vehicleName, $message]);
+        $stmt = $pdo->prepare("INSERT INTO car_inquiries (user_id, name, type, email, vehicle_name, message, status, created_at) 
+                               VALUES (?, ?, 'car', ?, ?, ?, 'new', NOW())");
+        $stmt->execute([$userId, $name, $email, $vehicleName, $message]);
         
         // Redirect back with success message
         header("Location: ../onmarket.php?status=success&message=" . urlencode("Your inquiry has been submitted successfully. A specialist will contact you shortly."));

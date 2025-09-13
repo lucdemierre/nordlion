@@ -1,5 +1,97 @@
 <?php
+// contact.php
+session_start();
+
+// ---- Auth flags (used by header) ----
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName   = $isLoggedIn ? ($_SESSION['user_name'] ?? '') : '';
+$userRole   = $isLoggedIn ? ($_SESSION['user_role'] ?? '') : '';
+
+// ---- DB ----
+require_once 'php/db.php';
+
+// ---- Inquiry type options (no DB call needed) ----
+$INQUIRY_TYPES = [
+  ['value' => 'general',    'label' => 'General Inquiry'],
+  ['value' => 'car',        'label' => 'Car Inquiry'],
+  ['value' => 'jet',        'label' => 'Jet Inquiry'],
+  ['value' => 'investment', 'label' => 'Investment Opportunity'],
+  ['value' => 'other',      'label' => 'Other'],
+];
+
+// ---- Prefill email for logged-in users ----
+$email = '';
+if ($isLoggedIn) {
+    if (!empty($_SESSION['user_email'])) {
+        $email = $_SESSION['user_email'];
+    } else {
+        try {
+            $s = $pdo->prepare("SELECT email FROM users WHERE id = ? LIMIT 1");
+            $s->execute([$_SESSION['user_id']]);
+            $dbEmail = $s->fetchColumn();
+            if ($dbEmail) {
+                $email = $dbEmail;
+                $_SESSION['user_email'] = $dbEmail; // cache
+            }
+        } catch (PDOException $e) {
+            // ignore quietly; user can still type an email
+        }
+    }
+}
+
+// ---- POST handling ----
+$success_message = null;
+$error_message   = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Trim + basic sanitize
+    $name         = trim($_POST['name'] ?? '');
+    $emailPosted  = trim($_POST['email'] ?? '');
+    $inquiry_type = trim($_POST['inquiry_type'] ?? '');
+    $message      = trim($_POST['message'] ?? '');
+    $user_id      = $_SESSION['user_id'] ?? null;
+
+    // Prefer posted email if present
+    if ($emailPosted !== '') {
+        $email = $emailPosted;
+    }
+
+    // Validation
+    if (!$user_id) {
+        $error_message = "Please log in before sending an inquiry.";
+    } elseif ($name === '' || $email === '' || $inquiry_type === '' || $message === '') {
+        $error_message = "Please fill in all fields.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error_message = "Please enter a valid email address.";
+    } else {
+        // subject is REQUIRED by your table; derive it from type
+        $subject = ucfirst($inquiry_type) . " Inquiry";
+
+        // Optional: associate a car (your schema allows NULL)
+        $car_id = null;
+
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO inquiries (user_id, type, subject, message, status, car_id)
+                VALUES (?, ?, ?, ?, 'new', ?)
+            ");
+            $stmt->execute([$user_id, $inquiry_type, $subject, $message, $car_id]);
+            $success_message = "Thank you for your inquiry. We'll get back to you soon!";
+        } catch (PDOException $e) {
+            error_log('contact.php INSERT failed: ' . $e->getMessage());
+            $error_message = "There was an error submitting your inquiry. Please try again.";
+        }
+    }
+}
+
+// Convenience: first name (for greetings if you ever need it)
+$firstName = '';
+if (!empty($userName)) {
+    $parts = explode(' ', $userName);
+    $firstName = $parts[0];
+}
 require 'php/db.php';
+
 
 // Fetch all cars from the database
 $stmt = $pdo->query("SELECT * FROM cars ORDER BY id DESC");
@@ -16,17 +108,28 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
 <header id="header">
         <div class="header-container">
-            <a href="index.html" class="logo">
+            <a href="index.php" class="logo">
                 <img src="img/logo-2.png" alt="NordLion Logo">
                 <span class="logo-text">NordLion International</span>
             </a>
             <nav>
                 <ul id="nav-menu">
-                    <li><a href="dashboard.php" class="active">Dashboard</a></li>
-                    <li><a href="inquiries.php">Inquiries</a></li>
-                    <li><a href="onmarket.html">Cars</a></li>
-                    <li><a href="jets.html">Jets</a></li>
-                    <li><a href="logout.php">Logout</a></li>
+                    <li><a href="index.php" class="active">Home</a></li>
+                    <li><a href="onmarket.php">Cars</a></li>
+                    <li><a href="offmarket.php">Off Market</a></li>
+                    <li><a href="about.php">About Us</a></li>
+                    <li><a href="team.php">Our Team</a></li>
+                    <li><a href="contact.php">Contact</a></li>
+                    <?php if ($isLoggedIn): ?>
+                        <?php if ($userRole === 'admin'): ?>
+                            <li><a href="dashboard.php">Admin Panel</a></li>
+                        <?php elseif ($userRole === 'vc'): ?>
+                            <li><a href="vc_dashboard.php">VC Panel</a></li>
+                        <?php endif; ?>
+                        <li><a href="logout.php">Logout</a></li>
+                    <?php else: ?>
+                        <li><a href="login.html">Login</a></li>
+                    <?php endif; ?>
                 </ul>
                 <button class="mobile-menu-btn" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
@@ -78,10 +181,15 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <li><a href="onmarket.php">Cars</a></li>
                 <li><a href="offmarket.php">Off Market</a></li>
                 <li><a href="about.php">About Us</a></li>
+                <li><a href="team.php">Our Team</a></li>
                 <li><a href="contact.php">Contact</a></li>
+                    <?php if ($isLoggedIn): ?>
+                    <li><a href="logout.php">Logout</a></li>
+                <?php else: ?>
+                    <li><a href="login.html">Login</a></li>
+                <?php endif; ?>
             </ul>
             </div>
-
             <div class="footer-links">
             <h4 class="footer-heading">Services</h4>
             <ul>
@@ -101,12 +209,6 @@ $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </ul>
             </div>
         </div>
-
-        <div class="copyright">
-            <p>&copy; 2025 NordLion International. All rights reserved.</p>
-        </div>
-        </div>
-    </footer>
 
         <div class="copyright">
             <p>&copy; 2025 NordLion International. All rights reserved.</p>

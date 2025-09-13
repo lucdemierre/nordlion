@@ -110,6 +110,12 @@ $userRole = $isLoggedIn ? $_SESSION['user_role'] : '';
                         <p class="card-description">View Off Market Inquiries.</p>
                         <a href="offmarket_inquiries_admin.php" class="btn btn-primary">Off Market Inquiries</a>
                     </div>
+                    
+                     <div class="card">
+                        <h2 class="card-title">View Users</h2>
+                        <p class="card-description">View and Edit Current Users.</p>
+                        <a href="admin_users.php" class="btn btn-primary">View Users</a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -164,10 +170,15 @@ $userRole = $isLoggedIn ? $_SESSION['user_role'] : '';
                 <li><a href="onmarket.php">Cars</a></li>
                 <li><a href="offmarket.php">Off Market</a></li>
                 <li><a href="about.php">About Us</a></li>
+                <li><a href="team.php">Our Team</a></li>
                 <li><a href="contact.php">Contact</a></li>
+                    <?php if ($isLoggedIn): ?>
+                    <li><a href="logout.php">Logout</a></li>
+                <?php else: ?>
+                    <li><a href="login.html">Login</a></li>
+                <?php endif; ?>
             </ul>
             </div>
-
             <div class="footer-links">
             <h4 class="footer-heading">Services</h4>
             <ul>

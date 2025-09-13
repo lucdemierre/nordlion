@@ -264,19 +264,6 @@ if ($isLoggedIn && !empty($userName)) {
         </div>
       </div>
     </section>
-
-    <?php if (!empty($car['features'])): ?>
-  <section class="car-features">
-    <h2 class="section-title">Exceptional Features</h2>
-    <ul class="features-grid">
-      <?php foreach (explode("\n", trim($car['features'])) as $feature): ?>
-        <?php if (trim($feature)): ?>
-          <li class="feature-card"><?php echo htmlspecialchars($feature); ?></li>
-        <?php endif; ?>
-      <?php endforeach; ?>
-    </ul>
-  </section>
-<?php endif; ?>
   </main> <!-- Close the main tag before inquiry section -->
 
   <!-- Inquiry Section -->
@@ -369,10 +356,15 @@ I'm interested in the <?php echo htmlspecialchars($car['name'] . ' ' . $car['mod
                 <li><a href="onmarket.php">Cars</a></li>
                 <li><a href="offmarket.php">Off Market</a></li>
                 <li><a href="about.php">About Us</a></li>
+                <li><a href="team.php">Our Team</a></li>
                 <li><a href="contact.php">Contact</a></li>
+                    <?php if ($isLoggedIn): ?>
+                    <li><a href="logout.php">Logout</a></li>
+                <?php else: ?>
+                    <li><a href="login.html">Login</a></li>
+                <?php endif; ?>
             </ul>
             </div>
-
             <div class="footer-links">
             <h4 class="footer-heading">Services</h4>
             <ul>

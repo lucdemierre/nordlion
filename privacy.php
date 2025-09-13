@@ -283,10 +283,15 @@ if (!empty($userName)) {
                 <li><a href="onmarket.php">Cars</a></li>
                 <li><a href="offmarket.php">Off Market</a></li>
                 <li><a href="about.php">About Us</a></li>
+                <li><a href="team.php">Our Team</a></li>
                 <li><a href="contact.php">Contact</a></li>
+                    <?php if ($isLoggedIn): ?>
+                    <li><a href="logout.php">Logout</a></li>
+                <?php else: ?>
+                    <li><a href="login.html">Login</a></li>
+                <?php endif; ?>
             </ul>
             </div>
-
             <div class="footer-links">
             <h4 class="footer-heading">Services</h4>
             <ul>

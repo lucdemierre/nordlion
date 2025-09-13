@@ -733,20 +733,4 @@ select.form-input:focus,
   box-shadow: 0 0 0 3px rgba(200, 164, 94, .15); /* optional, matches focus glow */
 }
 
-/* Inquiry-style chip tints for role select pills */
-.role-admin-bg{
-  background: rgba(200,164,94,.12) !important;
-  border-color: rgba(200,164,94,.35) !important;
-  color:#8a6a2f !important;
-}
-.role-vc-bg{
-  background: rgba(15,44,89,.08) !important;
-  border-color: rgba(15,44,89,.25) !important;
-  color:#0F2C59 !important;
-}
-.role-mop-bg{
-  background: rgba(108,117,125,.12) !important;
-  border-color: rgba(108,117,125,.25) !important;
-  color:#495057 !important;
-}
 
